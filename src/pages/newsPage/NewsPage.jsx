@@ -1,69 +1,42 @@
 import { Button, Flex, Table, Typography } from "antd";
-import { AddNewsModal, EditNewsModal, Wrapper } from "../../common";
+import {
+  AddNewsModal,
+  EditNewsModal,
+  WarningModal,
+  Wrapper,
+} from "../../common";
 import { NewsFilter } from "../../components";
 import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 import styles from "./NewsPage.module.scss";
 import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
-import { useState } from "react";
-
-// const news = [
-//   {
-//     guid: "1",
-//     title: "Новости из мира технологий",
-//     description: "Новейшие разработки в сфере ИТ и технологий.",
-//     date: "2025-03-25",
-//     folder_name: "tech_photo.jpg",
-//   },
-//   {
-//     guid: "2",
-//     title: "Обновления в мире медицины",
-//     description: "Прогресс в лечении и новых медицинских исследованиях.",
-//     date: "2025-03-24",
-//     folder_name: "medicine_photo.jpg",
-//   },
-//   {
-//     guid: "3",
-//     title: "Экологические новости",
-//     description: "Состояние экологии и новые инициативы по защите природы.",
-//     date: "2025-03-23",
-//     folder_name: "eco_photo.jpg",
-//   },
-//   {
-//     guid: "4",
-//     title: "Спортивные события года",
-//     description: "Самые ожидаемые спортивные события 2025 года.",
-//     date: "2025-03-22",
-//     folder_name: "sports_photo.jpg",
-//   },
-//   {
-//     guid: "5",
-//     title: "Новости культуры и искусства",
-//     description: "Обзор культурных событий и новых выставок.",
-//     date: "2025-03-21",
-//     folder_name: "culture_photo.jpg",
-//   },
-//   {
-//     guid: "5",
-//     title: "Новости культуры и искусства",
-//     description: "Обзор культурных событий и новых выставок.",
-//     date: "2025-03-21",
-//     folder_name: "culture_photo.jpg",
-//   },
-// ];
+import { useState, useEffect } from "react";
 
 export const NewsPage = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [searchName, setSearchName] = useState("");
+  const [searchDate, setSearchDate] = useState();
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openWarningModal, setOpenWarningModal] = useState(false);
+  const [newsArr, setNewsArr] = useState([]);
+  const newsId = localStorage.getItem("newsId");
+
+  useEffect(() => {
+    const storedNews = localStorage.getItem("newsArr");
+    if (storedNews) {
+      setNewsArr(JSON.parse(storedNews));
+    }
+  }, []);
 
   const onOpenEditModal = () => {
     setOpenEditModal(true);
   };
-  const { columns } = useNewsColums({ onOpenEditModal });
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [searchName, setSearchName] = useState("");
-  const [searchDate, setSearchDate] = useState();
 
-  const news = JSON.parse(localStorage.getItem("newsArr"));
+  const onOpenWarningModal = () => {
+    setOpenWarningModal(true);
+  };
+
+  const { columns } = useNewsColums({ onOpenEditModal, onOpenWarningModal });
 
   const onCloseAddModal = () => {
     setOpenAddModal(false);
@@ -73,8 +46,12 @@ export const NewsPage = () => {
     setOpenEditModal(false);
   };
 
+  const onCloseWarningModal = () => {
+    setOpenWarningModal(false);
+  };
+
   const filteredArr = () => {
-    return news.filter((item) => {
+    return newsArr.filter((item) => {
       const matchesName = searchName
         ? item.title.toLowerCase().includes(searchName.toLowerCase())
         : true;
@@ -85,6 +62,29 @@ export const NewsPage = () => {
 
       return matchesName && matchesDate;
     });
+  };
+
+  const removeNews = () => {
+    const updatedNews = newsArr.filter((item) => item.guid !== newsId);
+    setNewsArr(updatedNews);
+    localStorage.setItem("newsArr", JSON.stringify(updatedNews));
+    setOpenWarningModal(false);
+  };
+
+  const addNews = (newNews) => {
+    const updatedNewsArr = [...newsArr, newNews];
+    setNewsArr(updatedNewsArr);
+    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
+  };
+
+  const onUpdateNews = (updatedNews) => {
+    const updatedNewsArr = newsArr.map((item) =>
+      item.guid === updatedNews.guid ? updatedNews : item
+    );
+
+    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
+    setNewsArr(updatedNewsArr);
+    setOpenEditModal(false);
   };
 
   return (
@@ -114,8 +114,21 @@ export const NewsPage = () => {
           rowKey="guid"
         />
       </Wrapper>
-      <AddNewsModal open={openAddModal} onCancel={onCloseAddModal} />
-      <EditNewsModal open={openEditModal} onCancel={onCloseEditModal} />
+      <AddNewsModal
+        open={openAddModal}
+        onCancel={onCloseAddModal}
+        onAdd={addNews}
+      />
+      <EditNewsModal
+        open={openEditModal}
+        onCancel={onCloseEditModal}
+        onUpdate={onUpdateNews}
+      />
+      <WarningModal
+        open={openWarningModal}
+        onCancel={onCloseWarningModal}
+        onConfirm={removeNews}
+      />
     </Flex>
   );
 };

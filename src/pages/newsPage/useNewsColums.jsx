@@ -1,16 +1,21 @@
-import { EditOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Flex } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
 import styles from "./NewsPage.module.scss";
 
-export const useNewsColums = ({ onOpenEditModal }) => {
+export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
   const [getId, setGetId] = useState("");
   localStorage.setItem("newsId", getId);
 
   const onGetId = (guid) => {
     setGetId(guid);
     onOpenEditModal();
+  };
+
+  const removNews = (guid) => {
+    setGetId(guid);
+    onOpenWarningModal();
   };
 
   const columns = [
@@ -20,6 +25,7 @@ export const useNewsColums = ({ onOpenEditModal }) => {
       key: "guid",
       align: "center",
       width: 30,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Название",
@@ -65,9 +71,22 @@ export const useNewsColums = ({ onOpenEditModal }) => {
       align: "center",
       width: 50,
       render: (_, record) => (
-        <Button type="primary" onClick={() => onGetId(record.guid)}>
-          <EditOutlined />
-        </Button>
+        <Flex gap={"small"} justify="center">
+          <Button
+            type="primary"
+            onClick={() => onGetId(record.guid)}
+            style={{ width: "30px" }}
+          >
+            <EditOutlined />
+          </Button>
+          <Button
+            danger
+            style={{ width: "30px" }}
+            onClick={() => removNews(record.guid)}
+          >
+            <DeleteOutlined />
+          </Button>
+        </Flex>
       ),
     },
   ];

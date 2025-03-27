@@ -1,42 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useState, useEffect } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
-
+import { v4 as uuidv4 } from "uuid";
 const { Dragger } = Upload;
 
-export const AddNewsModal = ({ open, onCancel }) => {
+export const AddNewsModal = ({ open, onCancel, onAdd }) => {
   const [form] = Form.useForm();
-  const [newsArr, setNewsArr] = useState([]);
-  const [fileList, setFileList] = useState([]);
-
-  useEffect(() => {
-    const storedNews = localStorage.getItem("newsArr");
-    if (storedNews) {
-      setNewsArr(JSON.parse(storedNews));
-    }
-  }, []);
-
-  const onFinish = async (values) => {
-    const file = values.photo?.fileList?.[0]?.originFileObj;
-
-    const base64 = await toBase64(file);
-
-    const newNews = [
-      ...newsArr,
-      {
-        guid: newsArr.length + 1,
-        title: values.title,
-        description: values.description,
-        date: values.date,
-        photo: base64,
-      },
-    ];
-
-    setNewsArr(newNews);
-    localStorage.setItem("newsArr", JSON.stringify(newNews));
-    form.resetFields();
-    onCancel();
-  };
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -45,6 +13,24 @@ export const AddNewsModal = ({ open, onCancel }) => {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
+  };
+
+  const onFinish = async (values) => {
+    const file = values.photo?.fileList?.[0]?.originFileObj;
+
+    const base64 = await toBase64(file);
+
+    const newNews = {
+      guid: uuidv4(),
+      title: values.title,
+      description: values.description,
+      date: values.date.format("YYYY-MM-DD"),
+      photo: base64,
+    };
+
+    onAdd(newNews);
+    form.resetFields();
+    onCancel();
   };
 
   const onClose = () => {
@@ -77,7 +63,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
         >
           <Input.TextArea placeholder="Введите описание новости" />
         </Form.Item>
-        <Form.Item name="date" label="Содержание" rules={[{ required: true }]}>
+        <Form.Item name="date" label="Дата" rules={[{ required: true }]}>
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item initialValue={{}} name="photo" valuePropName="photos">

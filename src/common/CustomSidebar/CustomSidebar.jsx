@@ -6,11 +6,11 @@ import { useMemo } from "react";
 import logo from "../../assets/logo.png";
 
 const menuKeys = [
-  {
-    key: "1",
-    label: "О Sakbol",
-    path: "/",
-  },
+  // {
+  //   key: "1",
+  //   label: "О Sakbol",
+  //   path: "/",
+  // },
   {
     key: "2",
     label: "Новостная лента",

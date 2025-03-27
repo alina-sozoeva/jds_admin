@@ -1,38 +1,24 @@
-import { useState } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 
 const { Dragger } = Upload;
 
-export const EditNewsModal = ({ open, onCancel }) => {
+export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
   const [form] = Form.useForm();
   const newsArr = JSON.parse(localStorage.getItem("newsArr"));
-
   const newsId = localStorage.getItem("newsId");
+  const newsObj = newsArr?.find((item) => item.guid === newsId);
 
-  const newsObj = newsArr.find((item) => item.guid === parseInt(newsId));
-
-  const onFinish = async (values) => {
-    // const file = values.photo?.fileList?.[0]?.originFileObj;
-
-    // const base64 = await toBase64(file);
-
-    // const newNews = [
-    //   ...newsArr,
-    //   {
-    //     guid: newsArr.length + 1,
-    //     title: values.title,
-    //     description: values.description,
-    //     date: values.date,
-    //     photo: base64,
-    //   },
-    // ];
-
-    // setNewsArr(newNews);
-    // localStorage.setItem("newsArr", JSON.stringify(newNews));
-    // form.resetFields();
-    onCancel();
-  };
+  useEffect(() => {
+    if (newsObj) {
+      form.setFieldsValue({
+        title: newsObj?.title,
+        description: newsObj?.description,
+        date: dayjs(newsObj?.date),
+      });
+    }
+  }, [newsObj, form]);
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -41,6 +27,29 @@ export const EditNewsModal = ({ open, onCancel }) => {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
+  };
+
+  const onFinish = async (values) => {
+    const file = values.photo?.fileList?.[0]?.originFileObj;
+
+    const base64 = file ? await toBase64(file) : newsObj?.photo;
+
+    const updatedNews = {
+      ...newsObj,
+      title: values.title,
+      description: values.description,
+      date: values.date.format("YYYY-MM-DD"),
+      photo: base64,
+    };
+
+    const updatedNewsArr = newsArr.map((item) =>
+      item.guid === newsObj.guid ? updatedNews : item
+    );
+
+    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
+    onUpdate(updatedNews);
+    form.resetFields();
+    onCancel();
   };
 
   const onClose = () => {
@@ -62,42 +71,40 @@ export const EditNewsModal = ({ open, onCancel }) => {
         form={form}
         name="newsCreateForm"
         layout="vertical"
-        initialValues={{
-          title: newsObj?.title,
-          description: newsObj?.description,
-          date: dayjs(newsObj?.date),
-        }}
       >
-        <Form.Item name="title" label="Название" rules={[{ required: true }]}>
+        <Form.Item
+          name="title"
+          label="Название"
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
+        >
           <Input placeholder="Введите название" />
         </Form.Item>
         <Form.Item
           name="description"
           label="Содержание"
-          rules={[{ required: true }]}
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
         >
           <Input.TextArea placeholder="Введите описание новости" />
         </Form.Item>
-        <Form.Item name="date" label="Содержание" rules={[{ required: true }]}>
+        <Form.Item
+          name="date"
+          label="Дата"
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
+        >
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
-        <Form.Item initialValue={{}} name="photo" valuePropName="photos">
+        <Form.Item name="photo" valuePropName="photos">
           <Dragger
             name="file"
             multiple={false}
+            maxCount={1}
             beforeUpload={() => false}
-            fileList={
-              newsObj?.photo
-                ? [
-                    {
-                      uid: "-1",
-                      name: "news-photo",
-                      status: "done",
-                      url: newsObj.photo,
-                    },
-                  ]
-                : []
-            }
           >
             <div className="flex justify-center items-center gap-[11px] h-[88px]">
               <p className="ant-upload-hint">
