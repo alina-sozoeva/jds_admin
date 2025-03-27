@@ -1,15 +1,16 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import dayjs from "dayjs";
 import styles from "./NewsPage.module.scss";
 
-export const useNewsColums = () => {
-  const navigate = useNavigate();
+export const useNewsColums = ({ onOpenEditModal }) => {
+  const [getId, setGetId] = useState("");
+  localStorage.setItem("newsId", getId);
 
-  const onStatus = (record) => {
-    console.log(record);
-
-    navigate(`/edit-folder/${record.guid}/${record.status}`);
+  const onGetId = (guid) => {
+    setGetId(guid);
+    onOpenEditModal();
   };
 
   const columns = [
@@ -39,21 +40,32 @@ export const useNewsColums = () => {
       key: "date",
       align: "center",
       width: 100,
+      render: (text) => dayjs(text).format("YYYY-MM-DD"),
     },
     {
       title: "Фото",
-      dataIndex: "folder_name",
-      key: "folder_name",
+      dataIndex: "photo",
+      key: "photo",
       align: "center",
       width: 100,
+      render: (photo) =>
+        photo ? (
+          <img
+            src={photo}
+            alt="Фото"
+            style={{ width: 50, height: 50, objectFit: "cover" }}
+          />
+        ) : (
+          "Нет фото"
+        ),
     },
     {
       title: "...",
       key: "guid",
       align: "center",
       width: 50,
-      render: (record) => (
-        <Button type="primary" onClick={() => onStatus(record)}>
+      render: (_, record) => (
+        <Button type="primary" onClick={() => onGetId(record.guid)}>
           <EditOutlined />
         </Button>
       ),

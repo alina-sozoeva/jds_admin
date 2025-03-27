@@ -1,40 +1,36 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useState } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
+import dayjs from "dayjs";
 
 const { Dragger } = Upload;
 
-export const AddNewsModal = ({ open, onCancel }) => {
+export const EditNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
-  const [newsArr, setNewsArr] = useState([]);
-  const [fileList, setFileList] = useState([]);
+  const newsArr = JSON.parse(localStorage.getItem("newsArr"));
 
-  useEffect(() => {
-    const storedNews = localStorage.getItem("newsArr");
-    if (storedNews) {
-      setNewsArr(JSON.parse(storedNews));
-    }
-  }, []);
+  const newsId = localStorage.getItem("newsId");
+
+  const newsObj = newsArr.find((item) => item.guid === parseInt(newsId));
 
   const onFinish = async (values) => {
-    const file = values.photo?.fileList?.[0]?.originFileObj;
+    // const file = values.photo?.fileList?.[0]?.originFileObj;
 
-    const base64 = await toBase64(file);
+    // const base64 = await toBase64(file);
 
-    const newNews = [
-      ...newsArr,
-      {
-        guid: newsArr.length + 1,
-        title: values.title,
-        description: values.description,
-        date: values.date,
-        photo: base64,
-      },
-    ];
+    // const newNews = [
+    //   ...newsArr,
+    //   {
+    //     guid: newsArr.length + 1,
+    //     title: values.title,
+    //     description: values.description,
+    //     date: values.date,
+    //     photo: base64,
+    //   },
+    // ];
 
-    setNewsArr(newNews);
-    localStorage.setItem("newsArr", JSON.stringify(newNews));
-    form.resetFields();
+    // setNewsArr(newNews);
+    // localStorage.setItem("newsArr", JSON.stringify(newNews));
+    // form.resetFields();
     onCancel();
   };
 
@@ -58,7 +54,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
       centered
       open={open}
       onCancel={onClose}
-      title="Добавить новость"
+      title="Редактировать новость"
       footer={false}
     >
       <Form
@@ -66,6 +62,11 @@ export const AddNewsModal = ({ open, onCancel }) => {
         form={form}
         name="newsCreateForm"
         layout="vertical"
+        initialValues={{
+          title: newsObj?.title,
+          description: newsObj?.description,
+          date: dayjs(newsObj?.date),
+        }}
       >
         <Form.Item name="title" label="Название" rules={[{ required: true }]}>
           <Input placeholder="Введите название" />
@@ -84,8 +85,19 @@ export const AddNewsModal = ({ open, onCancel }) => {
           <Dragger
             name="file"
             multiple={false}
-            maxCount={1}
             beforeUpload={() => false}
+            fileList={
+              newsObj?.photo
+                ? [
+                    {
+                      uid: "-1",
+                      name: "news-photo",
+                      status: "done",
+                      url: newsObj.photo,
+                    },
+                  ]
+                : []
+            }
           >
             <div className="flex justify-center items-center gap-[11px] h-[88px]">
               <p className="ant-upload-hint">
@@ -94,11 +106,25 @@ export const AddNewsModal = ({ open, onCancel }) => {
             </div>
           </Dragger>
         </Form.Item>
+        {newsObj?.photo && (
+          <div className="mt-3 flex justify-center">
+            <img
+              src={newsObj.photo}
+              alt="Загруженное фото"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "200px",
+                borderRadius: "8px",
+                objectFit: "cover",
+              }}
+            />
+          </div>
+        )}
         <Form.Item>
           <Flex justify="space-between" align="center">
             <Button onClick={onClose}>Отмена</Button>
             <Button type="primary" htmlType="submit">
-              Добавить
+              Сохранить
             </Button>
           </Flex>
         </Form.Item>
