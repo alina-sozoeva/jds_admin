@@ -1,7 +1,9 @@
+import { Wrapper } from "../../common";
+
 export const AboutPage = () => {
   return (
-    <>
-      <>AboutPage</>
-    </>
+    <Wrapper title={"О компании"}>
+      <></>
+    </Wrapper>
   );
 };

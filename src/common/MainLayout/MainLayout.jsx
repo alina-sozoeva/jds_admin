@@ -1,13 +1,12 @@
 import { Layout } from "antd";
 import { CustomSidebar } from "../CustomSidebar";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
 
 export const MainLayout = () => {
   return (
     <Layout style={{ minHeight: "100vh", background: "white" }}>
       <Layout.Sider
-        width={190}
+        width={200}
         collapsible
         collapsedWidth={60}
         trigger={null}
@@ -27,7 +26,7 @@ export const MainLayout = () => {
       </Layout.Sider>
 
       <Layout style={{ marginLeft: 200 }}>
-        <Layout.Content style={{ background: "white" }} className={"basic"}>
+        <Layout.Content>
           <Outlet />
         </Layout.Content>
       </Layout>

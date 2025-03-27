@@ -17,9 +17,10 @@
 }
 
 .logo {
-  padding-left: 10px;
+  padding-left: 24px;
   img {
-    width: 150px;
+    width: 100px;
+    text-align: center;
   }
 }
 
@@ -28,6 +29,10 @@
   flex-direction: column;
   gap: 10px;
 }
+
+// .menu {
+//   background-color: #001529;
+// }
 
 .burger {
   display: flex;
