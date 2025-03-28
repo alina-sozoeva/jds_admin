@@ -5,16 +5,13 @@ import dayjs from "dayjs";
 import styles from "./NewsPage.module.scss";
 
 export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
-  const [getId, setGetId] = useState("");
-  localStorage.setItem("newsId", getId);
-
   const onGetId = (guid) => {
-    setGetId(guid);
+    localStorage.setItem("newsId", guid);
     onOpenEditModal();
   };
 
   const removNews = (guid) => {
-    setGetId(guid);
+    localStorage.setItem("newsId", guid);
     onOpenWarningModal();
   };
 

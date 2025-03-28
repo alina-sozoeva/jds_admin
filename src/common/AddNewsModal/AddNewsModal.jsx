@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
 import { v4 as uuidv4 } from "uuid";
+import foto from "../../assets/news.jpg";
+
 const { Dragger } = Upload;
 
 export const AddNewsModal = ({ open, onCancel, onAdd }) => {
@@ -18,7 +20,7 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
   const onFinish = async (values) => {
     const file = values.photo?.fileList?.[0]?.originFileObj;
 
-    const base64 = await toBase64(file);
+    const base64 = file ? await toBase64(file) : foto;
 
     const newNews = {
       guid: uuidv4(),
@@ -80,7 +82,14 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
         >
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
-        <Form.Item initialValue={{}} name="photo" valuePropName="photos">
+        <Form.Item
+          initialValue={{}}
+          name="photo"
+          valuePropName="photos"
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
+        >
           <Dragger
             name="file"
             multiple={false}

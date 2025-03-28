@@ -65,7 +65,11 @@ export const NewsPage = () => {
   };
 
   const removeNews = () => {
+    console.log(newsId);
+
     const updatedNews = newsArr.filter((item) => item.guid !== newsId);
+    console.log(updatedNews);
+
     localStorage.setItem("newsArr", JSON.stringify(updatedNews));
     setNewsArr(updatedNews);
     setOpenWarningModal(false);
