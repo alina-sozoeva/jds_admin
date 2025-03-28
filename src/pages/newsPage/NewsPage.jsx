@@ -66,8 +66,8 @@ export const NewsPage = () => {
 
   const removeNews = () => {
     const updatedNews = newsArr.filter((item) => item.guid !== newsId);
-    setNewsArr(updatedNews);
     localStorage.setItem("newsArr", JSON.stringify(updatedNews));
+    setNewsArr(updatedNews);
     setOpenWarningModal(false);
   };
 
@@ -86,7 +86,6 @@ export const NewsPage = () => {
     setNewsArr(updatedNewsArr);
     setOpenEditModal(false);
   };
-
 
   return (
     <Flex vertical className={styles.news}>

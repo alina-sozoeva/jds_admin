@@ -53,17 +53,31 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
         name="newsCreateForm"
         layout="vertical"
       >
-        <Form.Item name="title" label="Название" rules={[{ required: true }]}>
+        <Form.Item
+          name="title"
+          label="Название"
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
+        >
           <Input placeholder="Введите название" />
         </Form.Item>
         <Form.Item
           name="description"
           label="Содержание"
-          rules={[{ required: true }]}
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
         >
           <Input.TextArea placeholder="Введите описание новости" />
         </Form.Item>
-        <Form.Item name="date" label="Дата" rules={[{ required: true }]}>
+        <Form.Item
+          name="date"
+          label="Дата"
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
+        >
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item initialValue={{}} name="photo" valuePropName="photos">
