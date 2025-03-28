@@ -39,6 +39,7 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
       key: "description",
       align: "center",
       width: 150,
+      ellipsis: true,
     },
     {
       title: "Дата",

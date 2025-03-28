@@ -70,6 +70,7 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
           <Dragger
             name="file"
             multiple={false}
+            accept="image/*"
             maxCount={1}
             beforeUpload={() => false}
           >

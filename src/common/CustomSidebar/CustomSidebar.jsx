@@ -65,7 +65,7 @@ export const CustomSidebar = () => {
       <Button
         type="primary"
         className={`${styles.logout}`}
-        onClick={() => logOut()}
+        // onClick={() => logOut()}
       >
         <LogoutOutlined className={styles.out} /> Выход
       </Button>

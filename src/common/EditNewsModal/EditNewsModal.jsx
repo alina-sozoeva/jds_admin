@@ -104,6 +104,7 @@ export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
             name="file"
             multiple={false}
             maxCount={1}
+            accept="image/*"
             beforeUpload={() => false}
           >
             <div className="flex justify-center items-center gap-[11px] h-[88px]">

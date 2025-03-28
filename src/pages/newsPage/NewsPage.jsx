@@ -1,4 +1,4 @@
-import { Button, Flex, Table, Typography } from "antd";
+import { Button, Flex, Table, Tabs, Typography } from "antd";
 import {
   AddNewsModal,
   EditNewsModal,
@@ -86,6 +86,7 @@ export const NewsPage = () => {
     setNewsArr(updatedNewsArr);
     setOpenEditModal(false);
   };
+
 
   return (
     <Flex vertical className={styles.news}>
