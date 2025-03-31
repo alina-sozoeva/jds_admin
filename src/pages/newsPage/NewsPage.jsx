@@ -11,7 +11,7 @@ import styles from "./NewsPage.module.scss";
 import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
-import { useAddNewsMutation, useGetNewsQuery } from "../../store";
+import { useGetNewsQuery } from "../../store";
 
 export const NewsPage = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -22,9 +22,8 @@ export const NewsPage = () => {
   const [newsArr, setNewsArr] = useState([]);
   const newsId = localStorage.getItem("newsId");
 
-  // const { data } = useGetNewsQuery();
+  const { data } = useGetNewsQuery();
 
-  const [add_news] = useAddNewsMutation();
 
   // console.log(data);
 

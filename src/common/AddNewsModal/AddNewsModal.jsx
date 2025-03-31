@@ -13,9 +13,8 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]); 
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
     });
   };
 
@@ -42,14 +41,16 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
 
     const base64 = file ? await toBase64(file) : foto;
 
-    add_news({
-      nameId: values.title,
-      descr: values.description,
-      date_publish: values.date.format("YYYY-MM-DD"),
-      file: base64,
-    });
+    console.log(base64, 'base64');
+    
 
-    // onAdd(add_news);
+    // add_news({
+    //   nameId: values.title,
+    //   descr: values.description,
+    //   date_publish: values.date.format("YYYY-MM-DD"),
+    //   file: base64,
+    // });
+
     form.resetFields();
     onCancel();
   };

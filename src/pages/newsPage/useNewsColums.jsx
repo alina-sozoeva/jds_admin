@@ -3,6 +3,7 @@ import { Button, Flex } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
 import styles from "./NewsPage.module.scss";
+import { useRemoveNewsMutation } from "../../store";
 
 export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
   const onGetId = (guid) => {
@@ -14,6 +15,7 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
     localStorage.setItem("newsId", guid);
     onOpenWarningModal();
   };
+
 
   const columns = [
     {

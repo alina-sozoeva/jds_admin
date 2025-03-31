@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Modal, Button } from "antd";
+import { Modal } from "antd";
 
 export const WarningModal = ({ open, onCancel, onConfirm }) => {
   return (
