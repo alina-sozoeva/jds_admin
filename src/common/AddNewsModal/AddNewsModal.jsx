@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
 import { v4 as uuidv4 } from "uuid";
 import foto from "../../assets/news.jpg";
+import { useAddNewsMutation } from "../../store";
 
 const { Dragger } = Upload;
 
 export const AddNewsModal = ({ open, onCancel, onAdd }) => {
   const [form] = Form.useForm();
+  const [add_news] = useAddNewsMutation();
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -17,20 +19,37 @@ export const AddNewsModal = ({ open, onCancel, onAdd }) => {
     });
   };
 
+  // const onFinish = async (values) => {
+  //   const file = values.photo?.fileList?.[0]?.originFileObj;
+
+  //   const base64 = file ? await toBase64(file) : foto;
+
+  //   const newNews = {
+  //     guid: uuidv4(),
+  //     title: values.title,
+  //     description: values.description,
+  //     date: values.date.format("YYYY-MM-DD"),
+  //     photo: base64,
+  //   };
+
+  //   onAdd(newNews);
+  //   form.resetFields();
+  //   onCancel();
+  // };
+
   const onFinish = async (values) => {
     const file = values.photo?.fileList?.[0]?.originFileObj;
 
     const base64 = file ? await toBase64(file) : foto;
 
-    const newNews = {
-      guid: uuidv4(),
-      title: values.title,
-      description: values.description,
-      date: values.date.format("YYYY-MM-DD"),
-      photo: base64,
-    };
+    add_news({
+      nameId: values.title,
+      descr: values.description,
+      date_publish: values.date.format("YYYY-MM-DD"),
+      file: base64,
+    });
 
-    onAdd(newNews);
+    // onAdd(add_news);
     form.resetFields();
     onCancel();
   };
