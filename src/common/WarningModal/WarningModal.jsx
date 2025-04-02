@@ -1,6 +1,13 @@
 import { Modal } from "antd";
+import { useRemoveNewsMutation } from "../../store";
 
-export const WarningModal = ({ open, onCancel, onConfirm }) => {
+export const WarningModal = ({ open, onCancel, id }) => {
+  const [remove] = useRemoveNewsMutation();
+
+  const onConfirm = () => {
+    remove(id);
+  };
+
   return (
     <Modal
       title="Подтвердите удаление"

@@ -1,49 +1,37 @@
-import { useState, useEffect } from "react";
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
-import { v4 as uuidv4 } from "uuid";
-import foto from "../../assets/news.jpg";
 import { useAddNewsMutation } from "../../store";
 
 const { Dragger } = Upload;
 
-export const AddNewsModal = ({ open, onCancel, onAdd }) => {
+export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]); 
+      reader.onload = () => resolve(reader.result.split(",")[1]);
       reader.readAsDataURL(file);
     });
   };
 
-  // const onFinish = async (values) => {
-  //   const file = values.photo?.fileList?.[0]?.originFileObj;
-
-  //   const base64 = file ? await toBase64(file) : foto;
-
-  //   const newNews = {
-  //     guid: uuidv4(),
-  //     title: values.title,
-  //     description: values.description,
-  //     date: values.date.format("YYYY-MM-DD"),
-  //     photo: base64,
-  //   };
-
-  //   onAdd(newNews);
-  //   form.resetFields();
-  //   onCancel();
-  // };
-
   const onFinish = async (values) => {
     const file = values.photo?.fileList?.[0]?.originFileObj;
+    const formData = new FormData();
 
-    const base64 = file ? await toBase64(file) : foto;
+    // const base64 = file ? await toBase64(file) : foto;
 
-    console.log(base64, 'base64');
-    
+    formData.append("nameId", values.title);
+    formData.append("descr", values.description);
+    formData.append("date_publish", values.date.format("YYYY-MM-DD"));
 
+    if (file) {
+      formData.append("file", file);
+    }
+
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
     // add_news({
     //   nameId: values.title,
     //   descr: values.description,

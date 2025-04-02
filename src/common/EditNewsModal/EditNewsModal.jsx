@@ -1,24 +1,13 @@
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
-import dayjs from "dayjs";
-import { useEffect } from "react";
+import { useGetNewsByIdQuery, useUpdateNewsMutation } from "../../store";
 
 const { Dragger } = Upload;
 
-export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
+export const EditNewsModal = ({ open, onCancel, id }) => {
   const [form] = Form.useForm();
-  const newsArr = JSON.parse(localStorage.getItem("newsArr"));
-  const newsId = localStorage.getItem("newsId");
-  const newsObj = newsArr?.find((item) => item.guid === newsId);
 
-  useEffect(() => {
-    if (newsObj) {
-      form.setFieldsValue({
-        title: newsObj?.title,
-        description: newsObj?.description,
-        date: dayjs(newsObj?.date),
-      });
-    }
-  }, [newsObj, form]);
+  // const { newsById } = useGetNewsByIdQuery(id);
+  const [update_news] = useUpdateNewsMutation();
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -32,22 +21,17 @@ export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
   const onFinish = async (values) => {
     const file = values.photo?.fileList?.[0]?.originFileObj;
 
-    const base64 = file ? await toBase64(file) : newsObj?.photo;
+    // const base64 = file ? await toBase64(file) : newsById?.foto;
 
-    const updatedNews = {
-      ...newsObj,
-      title: values.title,
-      description: values.description,
-      date: values.date.format("YYYY-MM-DD"),
-      photo: base64,
-    };
+    const base64 = await toBase64(file);
 
-    const updatedNewsArr = newsArr.map((item) =>
-      item.guid === newsObj.guid ? updatedNews : item
-    );
+    update_news({
+      nameId: values.title,
+      descr: values.description,
+      date_publish: values.date.format("YYYY-MM-DD"),
+      file: base64,
+    });
 
-    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
-    onUpdate(updatedNews);
     form.resetFields();
     onCancel();
   };
@@ -114,10 +98,10 @@ export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
             </div>
           </Dragger>
         </Form.Item>
-        {newsObj?.photo && (
+        {/* {newsById?.foto && (
           <div className="mt-3 flex justify-center">
             <img
-              src={newsObj.photo}
+              src={newsById.foto}
               alt="Загруженное фото"
               style={{
                 maxWidth: "100%",
@@ -127,7 +111,7 @@ export const EditNewsModal = ({ open, onCancel, onUpdate }) => {
               }}
             />
           </div>
-        )}
+        )} */}
         <Form.Item>
           <Flex justify="space-between" align="center">
             <Button onClick={onClose}>Отмена</Button>

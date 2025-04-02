@@ -1,4 +1,4 @@
-import { Button, Flex, Table, Tabs, Typography } from "antd";
+import { Button, Flex, Table, Typography } from "antd";
 import {
   AddNewsModal,
   EditNewsModal,
@@ -6,95 +6,153 @@ import {
   Wrapper,
 } from "../../common";
 import { NewsFilter } from "../../components";
-import { VerticalAlignBottomOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  VerticalAlignBottomOutlined,
+} from "@ant-design/icons";
 import styles from "./NewsPage.module.scss";
 import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGetNewsQuery } from "../../store";
 
 export const NewsPage = () => {
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [searchDate, setSearchDate] = useState();
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openWarningModal, setOpenWarningModal] = useState(false);
-  const [newsArr, setNewsArr] = useState([]);
-  const newsId = localStorage.getItem("newsId");
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [idNews, setIdNews] = useState("");
 
-  const { data } = useGetNewsQuery();
-
-
-  // console.log(data);
-
-  useEffect(() => {
-    const storedNews = localStorage.getItem("newsArr");
-    if (storedNews) {
-      setNewsArr(JSON.parse(storedNews));
-    }
-  }, []);
-
-  const onOpenEditModal = () => {
-    setOpenEditModal(true);
-  };
-
-  const onOpenWarningModal = () => {
+  const removeNews = (id) => {
+    setIdNews(id);
     setOpenWarningModal(true);
   };
 
-  const { columns } = useNewsColums({ onOpenEditModal, onOpenWarningModal });
-
-  const onCloseAddModal = () => {
-    setOpenAddModal(false);
+  const editNews = (id) => {
+    setIdNews(id);
+    setOpenEditModal(true);
   };
 
-  const onCloseEditModal = () => {
-    setOpenEditModal(false);
-  };
+  // const { columns } = useNewsColums();
 
-  const onCloseWarningModal = () => {
-    setOpenWarningModal(false);
-  };
+  const { data } = useGetNewsQuery();
+
+  const newsData = data?.body || [];
+
+  const updateArr = [
+    ...newsData,
+    {
+      codeid: 1,
+      nameId: "Новость 1",
+      descr: "Описание новости 1",
+      date_publish: "2025-04-02",
+      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    },
+
+    {
+      codeid: 2,
+      nameId: "Новость 1",
+      descr: "Описание новости 1",
+      date_publish: "2025-04-02",
+      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    },
+    {
+      codeid: 3,
+      nameId: "Новость 1",
+      descr: "Описание новости 1",
+      date_publish: "2025-04-02",
+      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    },
+  ];
+
+  const columns = [
+    {
+      title: "№",
+      dataIndex: "codeid",
+      key: "codeid",
+      align: "center",
+      width: 30,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Название",
+      dataIndex: "nameId",
+      key: "nameId",
+      width: 100,
+    },
+    {
+      title: "Описание",
+      dataIndex: "descr",
+      key: "descr",
+      align: "center",
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "Дата",
+      dataIndex: "date_publish",
+      key: "date_publish",
+      align: "center",
+      width: 100,
+      render: (text) => dayjs(text).format("YYYY-MM-DD"),
+    },
+    {
+      title: "Фото",
+      dataIndex: "photo",
+      key: "photo",
+      align: "center",
+      width: 100,
+      render: (file) =>
+        file ? (
+          <img
+            src={file}
+            alt="Фото"
+            style={{ width: 50, height: 50, objectFit: "cover" }}
+          />
+        ) : (
+          "Нет фото"
+        ),
+    },
+    {
+      title: "...",
+      key: "guid",
+      align: "center",
+      width: 50,
+      render: (_, record) => (
+        <Flex gap={"small"} justify="center">
+          <Button
+            type="primary"
+            onClick={() => editNews(record.codeid)}
+            style={{ width: "30px" }}
+          >
+            <EditOutlined />
+          </Button>
+          <Button
+            danger
+            style={{ width: "30px" }}
+            onClick={() => removeNews(record.codeid)}
+          >
+            <DeleteOutlined />
+          </Button>
+        </Flex>
+      ),
+    },
+  ];
 
   const filteredArr = () => {
-    return newsArr.filter((item) => {
+    return updateArr.filter((item) => {
       const matchesName = searchName
-        ? item.title.toLowerCase().includes(searchName.toLowerCase())
+        ? item.nameId.toLowerCase().includes(searchName.toLowerCase())
         : true;
 
       const matchesDate = searchDate
-        ? dayjs(item.date).isSame(dayjs(searchDate).startOf("day"))
+        ? dayjs(item.date_publish).isSame(dayjs(searchDate).startOf("day"))
         : true;
 
       return matchesName && matchesDate;
     });
-  };
-
-  const removeNews = () => {
-    console.log(newsId);
-
-    const updatedNews = newsArr.filter((item) => item.guid !== newsId);
-    console.log(updatedNews);
-
-    localStorage.setItem("newsArr", JSON.stringify(updatedNews));
-    setNewsArr(updatedNews);
-    setOpenWarningModal(false);
-  };
-
-  const addNews = (newNews) => {
-    const updatedNewsArr = [...newsArr, newNews];
-    setNewsArr(updatedNewsArr);
-    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
-  };
-
-  const onUpdateNews = (updatedNews) => {
-    const updatedNewsArr = newsArr.map((item) =>
-      item.guid === updatedNews.guid ? updatedNews : item
-    );
-
-    localStorage.setItem("newsArr", JSON.stringify(updatedNewsArr));
-    setNewsArr(updatedNewsArr);
-    setOpenEditModal(false);
   };
 
   return (
@@ -121,23 +179,23 @@ export const NewsPage = () => {
           bordered
           scroll={{ y: 350 }}
           pagination={false}
-          rowKey="guid"
+          rowKey="codeid"
         />
       </Wrapper>
       <AddNewsModal
         open={openAddModal}
-        onCancel={onCloseAddModal}
-        onAdd={addNews}
-      />
-      <EditNewsModal
-        open={openEditModal}
-        onCancel={onCloseEditModal}
-        onUpdate={onUpdateNews}
+        onCancel={() => setOpenAddModal(false)}
       />
       <WarningModal
         open={openWarningModal}
-        onCancel={onCloseWarningModal}
-        onConfirm={removeNews}
+        onCancel={() => setOpenWarningModal(false)}
+        id={idNews}
+      />
+
+      <EditNewsModal
+        open={openEditModal}
+        onCancel={() => setOpenEditModal(false)}
+        id={idNews}
       />
     </Flex>
   );

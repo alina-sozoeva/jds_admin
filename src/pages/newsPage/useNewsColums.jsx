@@ -1,49 +1,52 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Flex } from "antd";
-import { useState } from "react";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { EditNewsModal, WarningModal } from "../../common";
 import styles from "./NewsPage.module.scss";
-import { useRemoveNewsMutation } from "../../store";
 
-export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
-  const onGetId = (guid) => {
-    localStorage.setItem("newsId", guid);
-    onOpenEditModal();
+export const useNewsColums = () => {
+  const [openWarningModal, setOpenWarningModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [idNews, setIdNews] = useState();
+
+  const removeNews = (id) => {
+    setOpenWarningModal(true);
+    setIdNews(id);
   };
 
-  const removNews = (guid) => {
-    localStorage.setItem("newsId", guid);
-    onOpenWarningModal();
+  const editNews = (id) => {
+    setOpenEditModal(true);
+    setIdNews(id);
   };
-
 
   const columns = [
     {
       title: "№",
-      dataIndex: "guid",
-      key: "guid",
+      dataIndex: "codeid",
+      key: "codeid",
       align: "center",
       width: 30,
       render: (_, __, index) => index + 1,
     },
     {
       title: "Название",
-      dataIndex: "title",
-      key: "title",
+      dataIndex: "nameId",
+      key: "nameId",
       width: 100,
     },
     {
       title: "Описание",
-      dataIndex: "description",
-      key: "description",
+      dataIndex: "descr",
+      key: "descr",
       align: "center",
       width: 150,
       ellipsis: true,
     },
     {
       title: "Дата",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "date_publish",
+      key: "date_publish",
       align: "center",
       width: 100,
       render: (text) => dayjs(text).format("YYYY-MM-DD"),
@@ -54,10 +57,10 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
       key: "photo",
       align: "center",
       width: 100,
-      render: (photo) =>
-        photo ? (
+      render: (file) =>
+        file ? (
           <img
-            src={photo}
+            src={file}
             alt="Фото"
             style={{ width: 50, height: 50, objectFit: "cover" }}
           />
@@ -74,7 +77,7 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
         <Flex gap={"small"} justify="center">
           <Button
             type="primary"
-            onClick={() => onGetId(record.guid)}
+            onClick={() => editNews(record.guid)}
             style={{ width: "30px" }}
           >
             <EditOutlined />
@@ -82,7 +85,7 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
           <Button
             danger
             style={{ width: "30px" }}
-            onClick={() => removNews(record.guid)}
+            onClick={() => removeNews(record.guid)}
           >
             <DeleteOutlined />
           </Button>
@@ -90,6 +93,18 @@ export const useNewsColums = ({ onOpenEditModal, onOpenWarningModal }) => {
       ),
     },
   ];
+
+  <WarningModal
+    open={openWarningModal}
+    onCancel={() => setOpenWarningModal(false)}
+    id={idNews}
+  />;
+
+  <EditNewsModal
+    open={openEditModal}
+    onCancel={() => setOpenEditModal(false)}
+    id={idNews}
+  />;
 
   return {
     columns,

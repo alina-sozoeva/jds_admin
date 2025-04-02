@@ -12,6 +12,13 @@ export const newsApi = createApi({
       }),
       providesTags: ["NewsList"],
     }),
+    getNewsById: builder.query({
+      query: (id) => ({
+        url: `/api/get_news/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["NewsList"],
+    }),
     addNews: builder.mutation({
       query: (newNews) => ({
         url: "/add_news",
@@ -28,8 +35,21 @@ export const newsApi = createApi({
       }),
       invalidatesTags: ["NewsList"],
     }),
+    updateNews: builder.mutation({
+      query: (news) => ({
+        url: `/api/update_news`,
+        method: "POST",
+        body: news,
+      }),
+      invalidatesTags: ["NewsList"],
+    }),
   }),
 });
 
-export const { useGetNewsQuery, useAddNewsMutation, useRemoveNewsMutation } =
-  newsApi;
+export const {
+  useGetNewsQuery,
+  useAddNewsMutation,
+  useRemoveNewsMutation,
+  useGetNewsByIdQuery,
+  useUpdateNewsMutation,
+} = newsApi;
