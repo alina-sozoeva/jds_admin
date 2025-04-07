@@ -1,13 +1,16 @@
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
 import { useGetNewsByIdQuery, useUpdateNewsMutation } from "../../store";
+import dayjs from "dayjs";
+import { useEffect } from "react";
 
 const { Dragger } = Upload;
 
 export const EditNewsModal = ({ open, onCancel, id }) => {
   const [form] = Form.useForm();
 
-  // const { newsById } = useGetNewsByIdQuery(id);
   const [update_news] = useUpdateNewsMutation();
+
+  const { data } = useGetNewsByIdQuery(id);
 
   const toBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -18,18 +21,31 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
     });
   };
 
+  useEffect(() => {
+    if (data && data.body[0]) {
+      form.setFieldsValue({
+        title: data.body[0].nameid,
+        description: data.body[0].descr,
+        date: dayjs(data.body[0].date_publish),
+      });
+    }
+  }, [data, form]);
+
   const onFinish = async (values) => {
+    console.log(values);
+
     const file = values.photo?.fileList?.[0]?.originFileObj;
 
     // const base64 = file ? await toBase64(file) : newsById?.foto;
 
-    const base64 = await toBase64(file);
+    // const base64 = await toBase64(file);
 
     update_news({
-      nameId: values.title,
+      codeid: id,
+      nameid: values.title,
       descr: values.description,
-      date_publish: values.date.format("YYYY-MM-DD"),
-      file: base64,
+      date_publish: values.date.format("MM-DD-YYYY"),
+      file: "test",
     });
 
     form.resetFields();

@@ -21,23 +21,13 @@ export const AddNewsModal = ({ open, onCancel }) => {
 
     // const base64 = file ? await toBase64(file) : foto;
 
-    formData.append("nameId", values.title);
-    formData.append("descr", values.description);
-    formData.append("date_publish", values.date.format("YYYY-MM-DD"));
-
-    if (file) {
-      formData.append("file", file);
-    }
-
-    formData.forEach((value, key) => {
-      console.log(key, value);
+    add_news({
+      codeid: 0,
+      nameid: values.title,
+      descr: values.description,
+      date_publish: values.date.format("MM-DD-YYYY"),
+      file: "test",
     });
-    // add_news({
-    //   nameId: values.title,
-    //   descr: values.description,
-    //   date_publish: values.date.format("YYYY-MM-DD"),
-    //   file: base64,
-    // });
 
     form.resetFields();
     onCancel();
@@ -91,7 +81,6 @@ export const AddNewsModal = ({ open, onCancel }) => {
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item
-          initialValue={{}}
           name="photo"
           valuePropName="photos"
           rules={[

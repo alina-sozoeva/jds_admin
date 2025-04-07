@@ -39,34 +39,6 @@ export const NewsPage = () => {
 
   const { data } = useGetNewsQuery();
 
-  const newsData = data?.body || [];
-
-  const updateArr = [
-    ...newsData,
-    {
-      codeid: 1,
-      nameId: "Новость 1",
-      descr: "Описание новости 1",
-      date_publish: "2025-04-02",
-      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
-    },
-
-    {
-      codeid: 2,
-      nameId: "Новость 1",
-      descr: "Описание новости 1",
-      date_publish: "2025-04-02",
-      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
-    },
-    {
-      codeid: 3,
-      nameId: "Новость 1",
-      descr: "Описание новости 1",
-      date_publish: "2025-04-02",
-      file: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
-    },
-  ];
-
   const columns = [
     {
       title: "№",
@@ -78,8 +50,8 @@ export const NewsPage = () => {
     },
     {
       title: "Название",
-      dataIndex: "nameId",
-      key: "nameId",
+      dataIndex: "nameid",
+      key: "nameid",
       width: 100,
     },
     {
@@ -142,7 +114,7 @@ export const NewsPage = () => {
   ];
 
   const filteredArr = () => {
-    return updateArr.filter((item) => {
+    return data?.body?.filter((item) => {
       const matchesName = searchName
         ? item.nameId.toLowerCase().includes(searchName.toLowerCase())
         : true;

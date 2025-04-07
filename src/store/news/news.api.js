@@ -14,7 +14,7 @@ export const newsApi = createApi({
     }),
     getNewsById: builder.query({
       query: (id) => ({
-        url: `/api/get_news/${id}`,
+        url: `get_news/${id}`,
         method: "GET",
       }),
       providesTags: ["NewsList"],
@@ -37,7 +37,7 @@ export const newsApi = createApi({
     }),
     updateNews: builder.mutation({
       query: (news) => ({
-        url: `/api/update_news`,
+        url: "add_news",
         method: "POST",
         body: news,
       }),

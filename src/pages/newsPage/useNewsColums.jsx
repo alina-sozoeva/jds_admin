@@ -27,13 +27,13 @@ export const useNewsColums = () => {
       key: "codeid",
       align: "center",
       width: 30,
-      render: (_, __, index) => index + 1,
     },
     {
       title: "Название",
-      dataIndex: "nameId",
-      key: "nameId",
+      dataIndex: "nameid",
+      key: "nameid",
       width: 100,
+      render: (text) => text,
     },
     {
       title: "Описание",
