@@ -17,9 +17,11 @@ export const AddNewsModal = ({ open, onCancel }) => {
 
   const onFinish = async (values) => {
     const file = values.photo?.fileList?.[0]?.originFileObj;
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    // const base64 = file ? await toBase64(file) : foto;
+    // const base64 = await toBase64(file);
+
+    // console.log(base64);
 
     add_news({
       codeid: 0,
@@ -83,9 +85,9 @@ export const AddNewsModal = ({ open, onCancel }) => {
         <Form.Item
           name="photo"
           valuePropName="photos"
-          rules={[
-            { required: true, message: "Это обязательное поле для заполнения" },
-          ]}
+          // rules={[
+          //   { required: true, message: "Это обязательное поле для заполнения" },
+          // ]}
         >
           <Dragger
             name="file"

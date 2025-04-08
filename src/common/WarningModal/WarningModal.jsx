@@ -6,6 +6,7 @@ export const WarningModal = ({ open, onCancel, id }) => {
 
   const onConfirm = () => {
     remove(id);
+    onCancel();
   };
 
   return (
