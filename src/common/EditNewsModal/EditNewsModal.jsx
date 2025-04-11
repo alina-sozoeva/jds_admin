@@ -1,7 +1,11 @@
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
-import { useGetNewsByIdQuery, useUpdateNewsMutation } from "../../store";
+import {
+  useGetNewsByIdQuery,
+  useUpdateNewsMutation,
+  useUploadFileMutation,
+} from "../../store";
 import dayjs from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const { Dragger } = Upload;
 
@@ -10,16 +14,9 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
 
   const [update_news] = useUpdateNewsMutation();
 
-  const { data } = useGetNewsByIdQuery(id);
+  const [upload] = useUploadFileMutation();
 
-  const toBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
+  const { data } = useGetNewsByIdQuery(id);
 
   useEffect(() => {
     if (data && data.body[0]) {
@@ -32,20 +29,33 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
   }, [data, form]);
 
   const onFinish = async (values) => {
-    console.log(values);
+    let filePath = "";
+    const file = values.photo.fileList[0].originFileObj;
+    const fileBuffer = await file.arrayBuffer();
 
-    const file = values.photo?.fileList?.[0]?.originFileObj;
-
-    // const base64 = file ? await toBase64(file) : newsById?.foto;
-
-    // const base64 = await toBase64(file);
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const response = await upload(fileBuffer);
+        if (response?.data?.status === 200) {
+          filePath = response.data.body.path;
+        } else {
+          console.error("Ошибка при загрузке файла");
+          return;
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке файла:", err);
+        return;
+      }
+    }
 
     update_news({
       codeid: id,
       nameid: values.title,
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
-      file: "test",
+      file: filePath,
     });
 
     form.resetFields();
@@ -114,20 +124,6 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
             </div>
           </Dragger>
         </Form.Item>
-        {/* {newsById?.foto && (
-          <div className="mt-3 flex justify-center">
-            <img
-              src={newsById.foto}
-              alt="Загруженное фото"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "200px",
-                borderRadius: "8px",
-                objectFit: "cover",
-              }}
-            />
-          </div>
-        )} */}
         <Form.Item>
           <Flex justify="space-between" align="center">
             <Button onClick={onClose}>Отмена</Button>
@@ -137,6 +133,10 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
           </Flex>
         </Form.Item>
       </Form>
+
+      {/* <div className="mt-3 flex justify-center">
+        <button onClick={() => test()}>rhrteh</button>
+      </div> */}
     </Modal>
   );
 };

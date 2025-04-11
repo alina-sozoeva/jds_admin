@@ -1,34 +1,41 @@
 import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
-import { useAddNewsMutation } from "../../store";
+import { useAddNewsMutation, useUploadFileMutation } from "../../store";
 
 const { Dragger } = Upload;
 
 export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
-
-  const toBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.readAsDataURL(file);
-    });
-  };
+  const [upload] = useUploadFileMutation();
 
   const onFinish = async (values) => {
-    const file = values.photo?.fileList?.[0]?.originFileObj;
-    // const formData = new FormData();
+    let filePath = "";
+    const file = values.photo.fileList[0].originFileObj;
+    const fileBuffer = await file.arrayBuffer();
 
-    // const base64 = await toBase64(file);
-
-    // console.log(base64);
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const response = await upload(fileBuffer);
+        if (response?.data?.status === 200) {
+          filePath = response.data.body.path;
+        } else {
+          console.error("Ошибка при загрузке файла");
+          return;
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке файла:", err);
+        return;
+      }
+    }
 
     add_news({
       codeid: 0,
       nameid: values.title,
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
-      file: "test",
+      file: filePath,
     });
 
     form.resetFields();

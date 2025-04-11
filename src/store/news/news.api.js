@@ -37,11 +37,19 @@ export const newsApi = createApi({
     }),
     updateNews: builder.mutation({
       query: (news) => ({
-        url: "add_news",
+        url: "/add_news",
         method: "POST",
         body: news,
       }),
       invalidatesTags: ["NewsList"],
+    }),
+    uploadFile: builder.mutation({
+      query: (formData) => ({
+        url: "/upload",
+        method: "POST",
+        body: formData,
+        formData: true,
+      }),
     }),
   }),
 });
@@ -52,4 +60,5 @@ export const {
   useRemoveNewsMutation,
   useGetNewsByIdQuery,
   useUpdateNewsMutation,
+  useUploadFileMutation,
 } = newsApi;

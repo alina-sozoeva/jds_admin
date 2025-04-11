@@ -76,10 +76,10 @@ export const NewsPage = () => {
       key: "photo",
       align: "center",
       width: 100,
-      render: (file) =>
-        file ? (
+      render: (_, record) =>
+        record?.file ? (
           <img
-            src={file}
+            src={`https://sakbol.com/${record?.file}`}
             alt="Фото"
             style={{ width: 50, height: 50, objectFit: "cover" }}
           />
