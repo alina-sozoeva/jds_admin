@@ -24,29 +24,32 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         title: data.body[0].nameid,
         description: data.body[0].descr,
         date: dayjs(data.body[0].date_publish),
+        photo: data.body[0].file,
       });
     }
   }, [data, form]);
 
   const onFinish = async (values) => {
-    let filePath = "";
-    const file = values.photo.fileList[0].originFileObj;
-    const fileBuffer = await file.arrayBuffer();
+    console.log(values);
+    let filePath = data.body[0].file;
 
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      try {
-        const response = await upload(fileBuffer);
-        if (response?.data?.status === 200) {
-          filePath = response.data.body.path;
-        } else {
-          console.error("Ошибка при загрузке файла");
+    if (values.photo && values.photo.fileList) {
+      const file = values.photo.fileList[0].originFileObj;
+      const fileBuffer = await file.arrayBuffer();
+
+      if (file) {
+        try {
+          const response = await upload(fileBuffer);
+          if (response?.data?.status === 200) {
+            filePath = response.data.body.path;
+          } else {
+            console.error("Ошибка при загрузке файла");
+            return;
+          }
+        } catch (err) {
+          console.error("Ошибка при загрузке файла:", err);
           return;
         }
-      } catch (err) {
-        console.error("Ошибка при загрузке файла:", err);
-        return;
       }
     }
 
@@ -55,7 +58,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       nameid: values.title,
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
-      file: filePath,
+      file: filePath || data.body[0].file,
     });
 
     form.resetFields();

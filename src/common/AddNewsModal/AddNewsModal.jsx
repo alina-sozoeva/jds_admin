@@ -14,8 +14,6 @@ export const AddNewsModal = ({ open, onCancel }) => {
     const fileBuffer = await file.arrayBuffer();
 
     if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
       try {
         const response = await upload(fileBuffer);
         if (response?.data?.status === 200) {
@@ -92,9 +90,9 @@ export const AddNewsModal = ({ open, onCancel }) => {
         <Form.Item
           name="photo"
           valuePropName="photos"
-          // rules={[
-          //   { required: true, message: "Это обязательное поле для заполнения" },
-          // ]}
+          rules={[
+            { required: true, message: "Это обязательное поле для заполнения" },
+          ]}
         >
           <Dragger
             name="file"
