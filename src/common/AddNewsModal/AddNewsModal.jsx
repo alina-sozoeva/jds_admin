@@ -7,21 +7,38 @@ import {
   Input,
   Modal,
   Row,
+  Select,
+  Space,
   Upload,
 } from "antd";
 import { useAddNewsMutation, useUploadFileMutation } from "../../store";
 import foto from "../../assets/news.jpg";
+import { useState } from "react";
 
 const { Dragger } = Upload;
+
+const options = [
+  {
+    value: "cm",
+    label: "см",
+  },
+  {
+    value: "px",
+    label: "px",
+  },
+];
 
 export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
   const [upload] = useUploadFileMutation();
+  const [unit, setUnit] = useState();
 
-  const convertPX = (cm) => {
-    return (cm * 96) / 2.54;
+  const onChange = (value) => {
+    setUnit(value);
   };
+
+  const convertPX = (cm) => cm * 37.8;
 
   const onFinish = async (values) => {
     let filePath = "";
@@ -43,8 +60,22 @@ export const AddNewsModal = ({ open, onCancel }) => {
       }
     }
 
-    console.log(convertPX(values.height));
-    console.log(convertPX(values.width));
+    const width = () => {
+      if (unit === "cm") {
+        return convertPX(values.width);
+      }
+      return values.width;
+    };
+
+    const height = () => {
+      if (unit === "cm") {
+        return convertPX(values.height);
+      }
+      return values.height;
+    };
+
+    // console.log(width(), "width");
+    // console.log(height(), "height");
 
     add_news({
       codeid: 0,
@@ -52,6 +83,8 @@ export const AddNewsModal = ({ open, onCancel }) => {
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
       file: filePath,
+      width: values.width || null,
+      height: values.height || null,
     });
 
     form.resetFields();
@@ -65,14 +98,13 @@ export const AddNewsModal = ({ open, onCancel }) => {
 
   return (
     <Modal
-      width={500}
+      width={600}
       centered
       open={open}
       onCancel={onClose}
       title="Добавить новость"
       footer={false}
     >
-      {/* <img src={foto} alt="" style={{ width: "755px", height: "755px" }} /> */}
       <Form
         onFinish={onFinish}
         form={form}
@@ -108,9 +140,11 @@ export const AddNewsModal = ({ open, onCancel }) => {
         </Form.Item>
         <Row gutter={24}>
           <Col span={12}>
+            {/* <label>Длина фотографии:</label>
+            <Space.Compact> */}
             <Form.Item
               name="height"
-              label="Длина фотографии, см"
+              label="Длина фотографии, пиксель"
               rules={[
                 {
                   required: true,
@@ -120,11 +154,19 @@ export const AddNewsModal = ({ open, onCancel }) => {
             >
               <Input placeholder="Введите длину" />
             </Form.Item>
+            {/* <Select
+                defaultValue={options[0].label}
+                options={options}
+                onChange={onChange}
+              />
+            </Space.Compact> */}
           </Col>
           <Col span={12}>
+            {/* <label>Ширина фотографии:</label>
+            <Space.Compact> */}
             <Form.Item
               name="width"
-              label="Ширина фотографии, см"
+              label="Ширина фотографии, пиксель"
               rules={[
                 {
                   required: true,
@@ -134,6 +176,12 @@ export const AddNewsModal = ({ open, onCancel }) => {
             >
               <Input placeholder="Введите ширину" />
             </Form.Item>
+            {/* <Select
+                defaultValue={options[0].label}
+                options={options}
+                onChange={onChange}
+              />
+            </Space.Compact> */}
           </Col>
         </Row>
         <Form.Item

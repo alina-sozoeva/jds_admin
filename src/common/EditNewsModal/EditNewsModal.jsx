@@ -1,4 +1,14 @@
-import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Upload,
+} from "antd";
 import {
   useGetNewsByIdQuery,
   useUpdateNewsMutation,
@@ -26,6 +36,8 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         description: data.body[0].descr,
         date: dayjs(data.body[0].date_publish),
         photo: data.body[0].file,
+        width: data.body[0].width,
+        height: data.body[0].height,
       });
     }
   }, [data, form]);
@@ -58,6 +70,8 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
       file: filePath || data.body[0].file,
+      width: values.width || null,
+      height: values.height || null,
     });
 
     form.resetFields();
@@ -71,7 +85,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
 
   return (
     <Modal
-      width={500}
+      width={600}
       centered
       open={open}
       onCancel={onClose}
@@ -111,6 +125,36 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         >
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item
+              name="width"
+              label="Длина фотографии, пиксель"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите длину" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="height"
+              label="Ширина фотографии, пиксель"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите ширину" />
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item name="photo" valuePropName="photos">
           <Dragger
             name="file"

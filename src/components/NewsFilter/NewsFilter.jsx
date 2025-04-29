@@ -1,9 +1,9 @@
-import { DatePicker, Flex, Input, Select, Typography } from "antd";
+import { DatePicker, Flex, Input, Typography } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 export const NewsFilter = ({ setSearchName, setSearchDate }) => {
-  const onChange = (date, dateString) => {
+  const onChange = (date) => {
     if (!date) {
       setSearchDate(null);
     } else {
