@@ -12,3 +12,14 @@
   width: 100%;
   padding: 0 20px;
 }
+
+.ant-table-wrapper
+  .ant-table.ant-table-bordered
+  > .ant-table-container
+  > .ant-table-body
+  > table
+  > tbody
+  > tr
+  > td {
+  padding: 3px;
+}

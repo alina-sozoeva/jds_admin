@@ -1,5 +1,16 @@
-import { Button, DatePicker, Flex, Form, Input, Modal, Upload } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Upload,
+} from "antd";
 import { useAddNewsMutation, useUploadFileMutation } from "../../store";
+import foto from "../../assets/news.jpg";
 
 const { Dragger } = Upload;
 
@@ -7,6 +18,10 @@ export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
   const [upload] = useUploadFileMutation();
+
+  const convertPX = (cm) => {
+    return (cm * 96) / 2.54;
+  };
 
   const onFinish = async (values) => {
     let filePath = "";
@@ -27,6 +42,9 @@ export const AddNewsModal = ({ open, onCancel }) => {
         return;
       }
     }
+
+    console.log(convertPX(values.height));
+    console.log(convertPX(values.width));
 
     add_news({
       codeid: 0,
@@ -54,6 +72,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
       title="Добавить новость"
       footer={false}
     >
+      {/* <img src={foto} alt="" style={{ width: "755px", height: "755px" }} /> */}
       <Form
         onFinish={onFinish}
         form={form}
@@ -87,6 +106,36 @@ export const AddNewsModal = ({ open, onCancel }) => {
         >
           <DatePicker placeholder="Выберите дату" style={{ width: "100%" }} />
         </Form.Item>
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item
+              name="height"
+              label="Длина фотографии, см"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите длину" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="width"
+              label="Ширина фотографии, см"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите ширину" />
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item
           name="photo"
           valuePropName="photos"

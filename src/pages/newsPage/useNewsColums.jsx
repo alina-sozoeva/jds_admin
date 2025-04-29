@@ -1,25 +1,9 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Flex } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
-import { EditNewsModal, WarningModal } from "../../common";
 import styles from "./NewsPage.module.scss";
 
-export const useNewsColums = () => {
-  const [openWarningModal, setOpenWarningModal] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [idNews, setIdNews] = useState();
-
-  const removeNews = (id) => {
-    setOpenWarningModal(true);
-    setIdNews(id);
-  };
-
-  const editNews = (id) => {
-    setOpenEditModal(true);
-    setIdNews(id);
-  };
-
+export const useNewsColums = (removeNews, editNews) => {
   const columns = [
     {
       title: "№",
@@ -27,13 +11,14 @@ export const useNewsColums = () => {
       key: "codeid",
       align: "center",
       width: 30,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Название",
       dataIndex: "nameid",
       key: "nameid",
       width: 100,
-      render: (text) => text,
+      ellipsis: true,
     },
     {
       title: "Описание",
@@ -49,7 +34,7 @@ export const useNewsColums = () => {
       key: "date_publish",
       align: "center",
       width: 100,
-      render: (text) => dayjs(text).format("YYYY-MM-DD"),
+      render: (text) => dayjs(text).format("DD-MM-YYYY"),
     },
     {
       title: "Фото",
@@ -57,10 +42,10 @@ export const useNewsColums = () => {
       key: "photo",
       align: "center",
       width: 100,
-      render: (file) =>
-        file ? (
+      render: (_, record) =>
+        record?.file ? (
           <img
-            src={file}
+            src={`https://sakbol.com/${record?.file}`}
             alt="Фото"
             style={{ width: 50, height: 50, objectFit: "cover" }}
           />
@@ -77,7 +62,7 @@ export const useNewsColums = () => {
         <Flex gap={"small"} justify="center">
           <Button
             type="primary"
-            onClick={() => editNews(record.guid)}
+            onClick={() => editNews(record.codeid)}
             style={{ width: "30px" }}
           >
             <EditOutlined />
@@ -85,7 +70,7 @@ export const useNewsColums = () => {
           <Button
             danger
             style={{ width: "30px" }}
-            onClick={() => removeNews(record.guid)}
+            onClick={() => removeNews(record.codeid)}
           >
             <DeleteOutlined />
           </Button>
@@ -93,18 +78,6 @@ export const useNewsColums = () => {
       ),
     },
   ];
-
-  <WarningModal
-    open={openWarningModal}
-    onCancel={() => setOpenWarningModal(false)}
-    id={idNews}
-  />;
-
-  <EditNewsModal
-    open={openEditModal}
-    onCancel={() => setOpenEditModal(false)}
-    id={idNews}
-  />;
 
   return {
     columns,

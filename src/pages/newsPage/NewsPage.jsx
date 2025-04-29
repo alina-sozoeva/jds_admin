@@ -6,15 +6,11 @@ import {
   Wrapper,
 } from "../../common";
 import { NewsFilter } from "../../components";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  VerticalAlignBottomOutlined,
-} from "@ant-design/icons";
+import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 import styles from "./NewsPage.module.scss";
 import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useGetNewsQuery } from "../../store";
 
 export const NewsPage = () => {
@@ -35,97 +31,24 @@ export const NewsPage = () => {
     setOpenEditModal(true);
   };
 
-  // const { columns } = useNewsColums();
+  const { columns } = useNewsColums(removeNews, editNews);
 
   const { data } = useGetNewsQuery();
 
-  const columns = [
-    {
-      title: "№",
-      dataIndex: "codeid",
-      key: "codeid",
-      align: "center",
-      width: 30,
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Название",
-      dataIndex: "nameid",
-      key: "nameid",
-      width: 100,
-    },
-    {
-      title: "Описание",
-      dataIndex: "descr",
-      key: "descr",
-      align: "center",
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Дата",
-      dataIndex: "date_publish",
-      key: "date_publish",
-      align: "center",
-      width: 100,
-      render: (text) => dayjs(text).format("YYYY-MM-DD"),
-    },
-    {
-      title: "Фото",
-      dataIndex: "photo",
-      key: "photo",
-      align: "center",
-      width: 100,
-      render: (_, record) =>
-        record?.file ? (
-          <img
-            src={`https://sakbol.com/${record?.file}`}
-            alt="Фото"
-            style={{ width: 50, height: 50, objectFit: "cover" }}
-          />
-        ) : (
-          "Нет фото"
-        ),
-    },
-    {
-      title: "...",
-      key: "guid",
-      align: "center",
-      width: 50,
-      render: (_, record) => (
-        <Flex gap={"small"} justify="center">
-          <Button
-            type="primary"
-            onClick={() => editNews(record.codeid)}
-            style={{ width: "30px" }}
-          >
-            <EditOutlined />
-          </Button>
-          <Button
-            danger
-            style={{ width: "30px" }}
-            onClick={() => removeNews(record.codeid)}
-          >
-            <DeleteOutlined />
-          </Button>
-        </Flex>
-      ),
-    },
-  ];
-
-  const filteredArr = () => {
+  const filteredArr = useMemo(() => {
     return data?.body?.filter((item) => {
       const matchesName = searchName
-        ? item.nameId.toLowerCase().includes(searchName.toLowerCase())
+        ? item?.nameid?.toLowerCase().includes(searchName?.toLowerCase())
         : true;
 
       const matchesDate = searchDate
-        ? dayjs(item.date_publish).isSame(dayjs(searchDate).startOf("day"))
+        ? dayjs(item?.date_publish).format("YYYY-MM-DD") ===
+          dayjs(searchDate, "MM-DD-YYYY").format("YYYY-MM-DD")
         : true;
 
       return matchesName && matchesDate;
     });
-  };
+  }, [searchName, searchDate, data?.body]);
 
   return (
     <Flex vertical className={styles.news}>
@@ -146,10 +69,10 @@ export const NewsPage = () => {
         }
       >
         <Table
-          dataSource={filteredArr()}
+          dataSource={filteredArr}
           columns={columns}
           bordered
-          scroll={{ y: 350 }}
+          scroll={{ y: 300 }}
           pagination={false}
           rowKey="codeid"
         />

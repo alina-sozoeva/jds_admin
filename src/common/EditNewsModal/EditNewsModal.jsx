@@ -5,7 +5,8 @@ import {
   useUploadFileMutation,
 } from "../../store";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const { Dragger } = Upload;
 
@@ -16,7 +17,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
 
   const [upload] = useUploadFileMutation();
 
-  const { data } = useGetNewsByIdQuery(id);
+  const { data } = useGetNewsByIdQuery(id ? id : skipToken);
 
   useEffect(() => {
     if (data && data.body[0]) {
@@ -30,9 +31,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
   }, [data, form]);
 
   const onFinish = async (values) => {
-    console.log(values);
     let filePath = data.body[0].file;
-
     if (values.photo && values.photo.fileList) {
       const file = values.photo.fileList[0].originFileObj;
       const fileBuffer = await file.arrayBuffer();
