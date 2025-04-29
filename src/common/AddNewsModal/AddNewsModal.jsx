@@ -5,12 +5,15 @@ import {
   Flex,
   Form,
   Input,
+  InputNumber,
   Modal,
   Row,
+  Select,
+  Space,
   Upload,
 } from "antd";
 import { useAddNewsMutation, useUploadFileMutation } from "../../store";
-import foto from "../../assets/news.jpg";
+import { useState } from "react";
 
 const { Dragger } = Upload;
 
@@ -29,21 +32,26 @@ export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
   const [upload] = useUploadFileMutation();
-  // const [unit, setUnit] = useState();
+  const [unitWidth, setUnitWidth] = useState("px");
+  const [unitHeight, setUnitHeight] = useState("px");
 
-  // const onChange = (value) => {
-  //   setUnit(value);
-  // };
+  const onChangeWidth = (value) => {
+    setUnitWidth(value);
+  };
 
-  // const convertPX = (cm) => cm * 37.8;
+  const onChangeHeight = (value) => {
+    setUnitHeight(value);
+  };
+
+  const convertPX = (cm) => cm * 37.8;
 
   const onFinish = async (values) => {
     let filePath = "";
-    const file = values.photo.fileList[0].originFileObj;
-    const fileBuffer = await file.arrayBuffer();
+    const file = values.photo.fileList[0]?.originFileObj;
 
     if (file) {
       try {
+        const fileBuffer = await file.arrayBuffer();
         const response = await upload(fileBuffer);
         if (response?.data?.status === 200) {
           filePath = response.data.body.path;
@@ -57,28 +65,42 @@ export const AddNewsModal = ({ open, onCancel }) => {
       }
     }
 
+    const width =
+      unitWidth === "cm"
+        ? Math.round(convertPX(Number(values.width)))
+        : Number(values.width);
+
+    const height =
+      unitHeight === "cm"
+        ? Math.round(convertPX(Number(values.height)))
+        : Number(values.height);
+
     add_news({
       codeid: 0,
       nameid: values.title,
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
       file: filePath,
-      width: values.width || null,
-      height: values.height || null,
+      width: width || null,
+      height: height || null,
     });
 
+    setUnitWidth("px");
+    setUnitHeight("px");
     form.resetFields();
     onCancel();
   };
 
   const onClose = () => {
     onCancel();
+    setUnitWidth("px");
+    setUnitHeight("px");
     form.resetFields();
   };
 
   return (
     <Modal
-      width={600}
+      width={500}
       centered
       open={open}
       onCancel={onClose}
@@ -120,48 +142,47 @@ export const AddNewsModal = ({ open, onCancel }) => {
         </Form.Item>
         <Row gutter={24}>
           <Col span={12}>
-            {/* <label>Длина фотографии:</label>
-            <Space.Compact> */}
-            <Form.Item
-              name="width"
-              label="Длина фотографии, пиксель"
-              rules={[
-                {
-                  required: true,
-                  message: "Это обязательное поле для заполнения",
-                },
-              ]}
-            >
-              <Input placeholder="Введите длину" />
-            </Form.Item>
-            {/* <Select
-                defaultValue={options[0].label}
+            <label>Ширина фотографии:</label>
+            <Space.Compact>
+              <Form.Item
+                name="width"
+                rules={[
+                  {
+                    required: true,
+                    message: "Введите ширину",
+                  },
+                ]}
+              >
+                <Input type="number" placeholder="Введите ширину" />
+              </Form.Item>
+              <Select
+                value={unitWidth}
                 options={options}
-                onChange={onChange}
+                onChange={onChangeWidth}
               />
-            </Space.Compact> */}
+            </Space.Compact>
           </Col>
           <Col span={12}>
-            {/* <label>Ширина фотографии:</label>
-            <Space.Compact> */}
-            <Form.Item
-              name="height"
-              label="Высота фотографии, пиксель"
-              rules={[
-                {
-                  required: true,
-                  message: "Это обязательное поле для заполнения",
-                },
-              ]}
-            >
-              <Input placeholder="Введите высоту" />
-            </Form.Item>
-            {/* <Select
-                defaultValue={options[0].label}
+            <label>Высота фотографии:</label>
+            <Space.Compact>
+              <Form.Item
+                name="height"
+                rules={[
+                  {
+                    required: true,
+                    message: "Введите высоту",
+                  },
+                ]}
+              >
+                <Input type="number" placeholder="Введите высоту" />
+              </Form.Item>
+              <Select
+                value={unitHeight}
                 options={options}
-                onChange={onChange}
+                onChange={onChangeHeight}
+                style={{ width: "40%" }}
               />
-            </Space.Compact> */}
+            </Space.Compact>
           </Col>
         </Row>
         <Form.Item
@@ -180,7 +201,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
           >
             <div className="flex justify-center items-center gap-[11px] h-[88px]">
               <p className="ant-upload-hint">
-                Перетащите файлы, чтобы прикрепить их или выберите
+                Перетащите файл или нажмите для выбора
               </p>
             </div>
           </Dragger>
