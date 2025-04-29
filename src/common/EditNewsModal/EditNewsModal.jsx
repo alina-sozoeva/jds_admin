@@ -143,7 +143,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
           <Col span={12}>
             <Form.Item
               name="height"
-              label="Ширина фотографии, пиксель"
+              label="Высота фотографии, пиксель"
               rules={[
                 {
                   required: true,
@@ -151,7 +151,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
                 },
               ]}
             >
-              <Input placeholder="Введите ширину" />
+              <Input placeholder="Введите высоту" />
             </Form.Item>
           </Col>
         </Row>

@@ -7,13 +7,10 @@ import {
   Input,
   Modal,
   Row,
-  Select,
-  Space,
   Upload,
 } from "antd";
 import { useAddNewsMutation, useUploadFileMutation } from "../../store";
 import foto from "../../assets/news.jpg";
-import { useState } from "react";
 
 const { Dragger } = Upload;
 
@@ -32,13 +29,13 @@ export const AddNewsModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
   const [upload] = useUploadFileMutation();
-  const [unit, setUnit] = useState();
+  // const [unit, setUnit] = useState();
 
-  const onChange = (value) => {
-    setUnit(value);
-  };
+  // const onChange = (value) => {
+  //   setUnit(value);
+  // };
 
-  const convertPX = (cm) => cm * 37.8;
+  // const convertPX = (cm) => cm * 37.8;
 
   const onFinish = async (values) => {
     let filePath = "";
@@ -59,23 +56,6 @@ export const AddNewsModal = ({ open, onCancel }) => {
         return;
       }
     }
-
-    const width = () => {
-      if (unit === "cm") {
-        return convertPX(values.width);
-      }
-      return values.width;
-    };
-
-    const height = () => {
-      if (unit === "cm") {
-        return convertPX(values.height);
-      }
-      return values.height;
-    };
-
-    // console.log(width(), "width");
-    // console.log(height(), "height");
 
     add_news({
       codeid: 0,
@@ -143,7 +123,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
             {/* <label>Длина фотографии:</label>
             <Space.Compact> */}
             <Form.Item
-              name="height"
+              name="width"
               label="Длина фотографии, пиксель"
               rules={[
                 {
@@ -165,8 +145,8 @@ export const AddNewsModal = ({ open, onCancel }) => {
             {/* <label>Ширина фотографии:</label>
             <Space.Compact> */}
             <Form.Item
-              name="width"
-              label="Ширина фотографии, пиксель"
+              name="height"
+              label="Высота фотографии, пиксель"
               rules={[
                 {
                   required: true,
@@ -174,7 +154,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
                 },
               ]}
             >
-              <Input placeholder="Введите ширину" />
+              <Input placeholder="Введите высоту" />
             </Form.Item>
             {/* <Select
                 defaultValue={options[0].label}
