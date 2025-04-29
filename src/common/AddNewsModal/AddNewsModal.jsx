@@ -180,7 +180,6 @@ export const AddNewsModal = ({ open, onCancel }) => {
                 value={unitHeight}
                 options={options}
                 onChange={onChangeHeight}
-                style={{ width: "40%" }}
               />
             </Space.Compact>
           </Col>

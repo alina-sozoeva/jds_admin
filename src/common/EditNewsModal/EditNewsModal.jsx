@@ -54,7 +54,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
   };
 
   useEffect(() => {
-    if (data?.body?.[0]) {
+    if (open && data?.body?.[0]) {
       const item = data.body[0];
       form.setFieldsValue({
         title: item.nameid,
@@ -65,7 +65,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         photo: item.file,
       });
     }
-  }, [data, form]);
+  }, [open, data, form]);
 
   const onFinish = async (values) => {
     let filePath = data.body[0].file;
@@ -98,6 +98,9 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         ? Math.round(convertPX(Number(values.height)))
         : Number(values.height);
 
+    console.log(width, "width");
+    console.log(height, "height");
+
     update_news({
       codeid: id,
       nameid: values.title,
@@ -118,7 +121,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
     onCancel();
     setUnitWidth("px");
     setUnitHeight("px");
-    form.resetFields();
+    // form.resetFields();
   };
 
   return (
@@ -200,7 +203,6 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
                 value={unitHeight}
                 options={options}
                 onChange={onChangeHeight}
-                style={{ width: "40%" }}
               />
             </Space.Compact>
           </Col>
