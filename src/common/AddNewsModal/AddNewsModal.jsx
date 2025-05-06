@@ -14,6 +14,10 @@ import {
 } from "antd";
 import { useAddNewsMutation, useUploadFileMutation } from "../../store";
 import { useState } from "react";
+import Cropper from "react-easy-crop";
+import { DeleteOutlined } from "@ant-design/icons";
+import styles from "./AddNewsModal.module.scss";
+import foto from "../../assets/news.jpg";
 
 const { Dragger } = Upload;
 
@@ -34,6 +38,23 @@ export const AddNewsModal = ({ open, onCancel }) => {
   const [upload] = useUploadFileMutation();
   const [unitWidth, setUnitWidth] = useState("px");
   const [unitHeight, setUnitHeight] = useState("px");
+  const [file, setFile] = useState();
+  const [openCropper, setOpenCropper] = useState(false);
+
+  const onCropper = (file) => {
+    setOpenCropper(true);
+    setFile(file);
+  };
+
+  console.log(file, "file!!!!");
+  console.log(foto, "foto!!!");
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    console.log(croppedArea, croppedAreaPixels);
+  };
 
   const onChangeWidth = (value) => {
     setUnitWidth(value);
@@ -49,21 +70,21 @@ export const AddNewsModal = ({ open, onCancel }) => {
     let filePath = "";
     const file = values.photo.fileList[0]?.originFileObj;
 
-    if (file) {
-      try {
-        const fileBuffer = await file.arrayBuffer();
-        const response = await upload(fileBuffer);
-        if (response?.data?.status === 200) {
-          filePath = response.data.body.path;
-        } else {
-          console.error("Ошибка при загрузке файла");
-          return;
-        }
-      } catch (err) {
-        console.error("Ошибка при загрузке файла:", err);
-        return;
-      }
-    }
+    // if (file) {
+    //   try {
+    //     const fileBuffer = await file.arrayBuffer();
+    //     const response = await upload(fileBuffer);
+    //     if (response?.data?.status === 200) {
+    //       filePath = response.data.body.path;
+    //     } else {
+    //       console.error("Ошибка при загрузке файла");
+    //       return;
+    //     }
+    //   } catch (err) {
+    //     console.error("Ошибка при загрузке файла:", err);
+    //     return;
+    //   }
+    // }
 
     const width =
       unitWidth === "cm"
@@ -75,15 +96,15 @@ export const AddNewsModal = ({ open, onCancel }) => {
         ? Math.round(convertPX(Number(values.height)))
         : Number(values.height);
 
-    add_news({
-      codeid: 0,
-      nameid: values.title,
-      descr: values.description,
-      date_publish: values.date.format("MM-DD-YYYY"),
-      file: filePath,
-      width: width || null,
-      height: height || null,
-    });
+    // add_news({
+    //   codeid: 0,
+    //   nameid: values.title,
+    //   descr: values.description,
+    //   date_publish: values.date.format("MM-DD-YYYY"),
+    //   file: filePath,
+    //   width: width || null,
+    //   height: height || null,
+    // });
 
     setUnitWidth("px");
     setUnitHeight("px");
@@ -197,6 +218,23 @@ export const AddNewsModal = ({ open, onCancel }) => {
             accept="image/*"
             maxCount={1}
             beforeUpload={() => false}
+            itemRender={(originNode, file) => {
+              console.log(originNode, "originNode!!!");
+
+              return (
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  onClick={() => onCropper(file)}
+                  className={styles.wrap}
+                >
+                  <span>{file?.name}</span>
+                  <Button danger className={styles.btn}>
+                    <DeleteOutlined />
+                  </Button>
+                </Flex>
+              );
+            }}
           >
             <div className="flex justify-center items-center gap-[11px] h-[88px]">
               <p className="ant-upload-hint">
@@ -214,6 +252,18 @@ export const AddNewsModal = ({ open, onCancel }) => {
           </Flex>
         </Form.Item>
       </Form>
+      {openCropper && (
+        <Cropper
+          image={file}
+          crop={crop}
+          zoom={zoom}
+          aspect={4 / 3}
+          onCropChange={setCrop}
+          cropSize={{ width: 300, height: 300 }}
+          onCropComplete={onCropComplete}
+          onZoomChange={setZoom}
+        />
+      )}
     </Modal>
   );
 };

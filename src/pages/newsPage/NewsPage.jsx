@@ -12,6 +12,8 @@ import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { useGetNewsQuery } from "../../store";
+import Cropper from "react-easy-crop";
+import foto from "../../assets/news.jpg";
 
 export const NewsPage = () => {
   const [searchName, setSearchName] = useState("");
