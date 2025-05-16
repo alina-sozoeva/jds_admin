@@ -11,7 +11,10 @@ export const newsSlice = createSlice({
     addFoto: (state, action) => {
       state.foto = action.payload;
     },
+    clearFoto: (state, action) => {
+      state.foto = null;
+    },
   },
 });
 
-export const { addFoto } = newsSlice.actions;
+export const { addFoto, clearFoto } = newsSlice.actions;

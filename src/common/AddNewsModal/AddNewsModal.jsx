@@ -9,16 +9,21 @@ import {
   Row,
   Upload,
 } from "antd";
-import { useAddNewsMutation, useUploadFileMutation } from "../../store";
+import {
+  clearFoto,
+  useAddNewsMutation,
+  useUploadFileMutation,
+} from "../../store";
 import { useState } from "react";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import styles from "./AddNewsModal.module.scss";
 import { CropperImg } from "../CropperImg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Dragger } = Upload;
 
 export const AddNewsModal = ({ open, onCancel }) => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [add_news] = useAddNewsMutation();
   const [upload] = useUploadFileMutation();
@@ -32,10 +37,15 @@ export const AddNewsModal = ({ open, onCancel }) => {
     setFile(imageUrl);
   };
 
+  console.log(foto, "foto");
+
   const onFinish = async (values) => {
     let filePath = "";
 
-    const file = foto.fileList[0]?.originFileObj;
+    const file =
+      foto !== null
+        ? foto.fileList[0]?.originFileObj
+        : values.photo?.fileList[0]?.originFileObj;
 
     if (file) {
       try {
@@ -65,6 +75,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
 
     form.resetFields();
     setOpenCropper(false);
+    dispatch(clearFoto());
     setFile("");
     onCancel();
   };

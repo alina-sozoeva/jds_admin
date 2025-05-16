@@ -10,6 +10,7 @@ import {
   Upload,
 } from "antd";
 import {
+  clearFoto,
   useGetNewsByIdQuery,
   useUpdateNewsMutation,
   useUploadFileMutation,
@@ -17,7 +18,7 @@ import {
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import styles from "./EditNewsModal.module.scss";
 import { CropperImg } from "../CropperImg";
@@ -25,6 +26,8 @@ import { CropperImg } from "../CropperImg";
 const { Dragger } = Upload;
 
 export const EditNewsModal = ({ open, onCancel, id }) => {
+  const dispatch = useDispatch();
+
   const [form] = Form.useForm();
   const [update_news] = useUpdateNewsMutation();
   const [upload] = useUploadFileMutation();
@@ -52,7 +55,10 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
   const onFinish = async (values) => {
     let filePath = data.body[0].file;
 
-    const file = foto?.fileList?.[0]?.originFileObj;
+    const file =
+      foto !== null
+        ? foto.fileList[0]?.originFileObj
+        : values.photo?.fileList[0]?.originFileObj;
 
     if (file) {
       try {
@@ -82,6 +88,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
 
     form.resetFields();
     setOpenCropper(false);
+    dispatch(clearFoto());
     setFile("");
     onCancel();
   };
@@ -99,7 +106,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
 
   const onEditExisting = async () => {
     try {
-      const response = await fetch(`https://sakbol.com/${file}`);
+      const response = await fetch(`https://sakbol.com${file}`);
       const blob = await response.blob();
       const localUrl = URL.createObjectURL(blob);
 
@@ -117,6 +124,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
     onCancel();
     setOpenCropper(false);
     setFile("");
+    dispatch(clearFoto());
     form.resetFields();
   };
 
@@ -199,9 +207,9 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
                 </div>
               </Dragger>
             </Form.Item>
-            {/* <Button onClick={onEditExisting}>
+            <Button onClick={onEditExisting}>
               Отредактировать существующий
-            </Button> */}
+            </Button>
           </Col>
           {openCropper && (
             <Col span={12}>

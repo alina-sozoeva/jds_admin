@@ -84,7 +84,7 @@ export const CropperImg = ({ img, isEdit = false }) => {
             <Button
               onClick={showCroppedImage}
               variant="contained"
-              color="primary"
+              type="primary"
               className={styles.cropButton}
             >
               Обрезать
