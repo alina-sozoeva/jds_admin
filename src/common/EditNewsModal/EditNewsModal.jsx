@@ -5,11 +5,8 @@ import {
   Flex,
   Form,
   Input,
-  InputNumber,
   Modal,
   Row,
-  Select,
-  Space,
   Upload,
 } from "antd";
 import {
@@ -20,42 +17,25 @@ import {
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useSelector } from "react-redux";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import styles from "./EditNewsModal.module.scss";
+import { CropperImg } from "../CropperImg";
 
 const { Dragger } = Upload;
-
-const options = [
-  {
-    value: "cm",
-    label: "см",
-  },
-  {
-    value: "px",
-    label: "px",
-  },
-];
-
-const convertPX = (cm) => cm * 37.8;
 
 export const EditNewsModal = ({ open, onCancel, id }) => {
   const [form] = Form.useForm();
   const [update_news] = useUpdateNewsMutation();
   const [upload] = useUploadFileMutation();
   const { data } = useGetNewsByIdQuery(id ?? skipToken);
-
-  const [unitWidth, setUnitWidth] = useState("px");
-  const [unitHeight, setUnitHeight] = useState("px");
-
-  const onChangeWidth = (value) => {
-    setUnitWidth(value);
-  };
-
-  const onChangeHeight = (value) => {
-    setUnitHeight(value);
-  };
+  const foto = useSelector((state) => state.newsFoto.foto);
+  const [file, setFile] = useState();
+  const [openCropper, setOpenCropper] = useState(false);
 
   useEffect(() => {
+    const item = data?.body[0];
     if (open && data?.body?.[0]) {
-      const item = data.body[0];
       form.setFieldsValue({
         title: item.nameid,
         description: item.descr,
@@ -65,12 +45,14 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         photo: item.file,
       });
     }
+
+    setFile(item?.file);
   }, [open, data, form]);
 
   const onFinish = async (values) => {
     let filePath = data.body[0].file;
 
-    const file = values.photo?.fileList?.[0]?.originFileObj;
+    const file = foto?.fileList?.[0]?.originFileObj;
 
     if (file) {
       try {
@@ -88,45 +70,59 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       }
     }
 
-    const width =
-      unitWidth === "cm"
-        ? Math.round(convertPX(Number(values.width)))
-        : Number(values.width);
-
-    const height =
-      unitHeight === "cm"
-        ? Math.round(convertPX(Number(values.height)))
-        : Number(values.height);
-
-    console.log(width, "width");
-    console.log(height, "height");
-
     update_news({
       codeid: id,
       nameid: values.title,
       descr: values.description,
       date_publish: values.date.format("MM-DD-YYYY"),
       file: filePath,
-      width: width || null,
-      height: height || null,
+      width: 0,
+      height: 0,
     });
 
-    setUnitWidth("px");
-    setUnitHeight("px");
     form.resetFields();
+    setOpenCropper(false);
+    setFile("");
     onCancel();
+  };
+
+  const onCropper = (fileOrUrl) => {
+    const isUrl = typeof fileOrUrl === "string";
+
+    const imageUrl = isUrl
+      ? fileOrUrl
+      : URL.createObjectURL(fileOrUrl.originFileObj);
+
+    setOpenCropper(true);
+    setFile(imageUrl);
+  };
+
+  const onEditExisting = async () => {
+    try {
+      const response = await fetch(`https://sakbol.com/${file}`);
+      const blob = await response.blob();
+      const localUrl = URL.createObjectURL(blob);
+
+      const wrappedFile = {
+        originFileObj: new File([blob], "cropped.jpg", { type: blob.type }),
+      };
+
+      onCropper(wrappedFile);
+    } catch (err) {
+      console.error("Ошибка загрузки изображения:", err);
+    }
   };
 
   const onClose = () => {
     onCancel();
-    setUnitWidth("px");
-    setUnitHeight("px");
-    // form.resetFields();
+    setOpenCropper(false);
+    setFile("");
+    form.resetFields();
   };
 
   return (
     <Modal
-      width={500}
+      width={openCropper ? 900 : 500}
       centered
       open={open}
       onCancel={onClose}
@@ -139,89 +135,80 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         name="editNewsForm"
         layout="vertical"
       >
-        <Form.Item
-          name="title"
-          label="Название"
-          rules={[{ required: true, message: "Введите название" }]}
-        >
-          <Input placeholder="Введите название" />
-        </Form.Item>
-
-        <Form.Item
-          name="description"
-          label="Содержание"
-          rules={[{ required: true, message: "Введите описание" }]}
-        >
-          <Input.TextArea placeholder="Введите описание новости" />
-        </Form.Item>
-
-        <Form.Item
-          name="date"
-          label="Дата"
-          rules={[{ required: true, message: "Выберите дату" }]}
-        >
-          <DatePicker style={{ width: "100%" }} />
-        </Form.Item>
-
         <Row gutter={24}>
-          <Col span={12}>
-            <label>Ширина фотографии:</label>
-            <Space.Compact>
-              <Form.Item
-                name="width"
-                rules={[
-                  {
-                    required: true,
-                    message: "Введите ширину",
-                  },
-                ]}
+          <Col span={openCropper ? 12 : 24}>
+            <Form.Item
+              name="title"
+              label="Название"
+              rules={[{ required: true, message: "Введите название" }]}
+            >
+              <Input placeholder="Введите название" />
+            </Form.Item>
+
+            <Form.Item
+              name="description"
+              label="Содержание"
+              rules={[{ required: true, message: "Введите описание" }]}
+            >
+              <Input.TextArea placeholder="Введите описание новости" />
+            </Form.Item>
+
+            <Form.Item
+              name="date"
+              label="Дата"
+              rules={[{ required: true, message: "Выберите дату" }]}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="photo" valuePropName="photos">
+              <Dragger
+                name="file"
+                multiple={false}
+                accept="image/*"
+                maxCount={1}
+                beforeUpload={() => false}
+                itemRender={(originNode, file) => {
+                  console.log(originNode, "originNode!!!");
+
+                  return (
+                    <Flex
+                      justify="space-between"
+                      align="center"
+                      className={styles.wrap}
+                    >
+                      <span>{file?.name}</span>
+                      <Flex gap={"small"}>
+                        <Button
+                          className={styles.btn}
+                          onClick={() => onCropper(file)}
+                        >
+                          <EditOutlined />
+                        </Button>
+                        <Button danger className={styles.btn}>
+                          <DeleteOutlined />
+                        </Button>
+                      </Flex>
+                    </Flex>
+                  );
+                }}
               >
-                <Input type="number" placeholder="Введите ширину" />
-              </Form.Item>
-              <Select
-                value={unitWidth}
-                options={options}
-                onChange={onChangeWidth}
-              />
-            </Space.Compact>
+                <div className="flex justify-center items-center gap-[11px] h-[88px]">
+                  <p className="ant-upload-hint">
+                    Перетащите файл или нажмите для выбора
+                  </p>
+                </div>
+              </Dragger>
+            </Form.Item>
+            {/* <Button onClick={onEditExisting}>
+              Отредактировать существующий
+            </Button> */}
           </Col>
-          <Col span={12}>
-            <label>Высота фотографии:</label>
-            <Space.Compact>
-              <Form.Item
-                name="height"
-                rules={[
-                  {
-                    required: true,
-                    message: "Введите высоту",
-                  },
-                ]}
-              >
-                <Input type="number" placeholder="Введите высоту" />
-              </Form.Item>
-              <Select
-                value={unitHeight}
-                options={options}
-                onChange={onChangeHeight}
-              />
-            </Space.Compact>
-          </Col>
+          {openCropper && (
+            <Col span={12}>
+              <CropperImg img={file} />
+            </Col>
+          )}
         </Row>
-        <Form.Item name="photo" valuePropName="photos">
-          <Dragger
-            name="file"
-            multiple={false}
-            maxCount={1}
-            accept="image/*"
-            beforeUpload={() => false}
-          >
-            <div className="flex justify-center items-center gap-[11px] h-[88px]">
-              <p className="ant-upload-hint">
-                Перетащите файлы или нажмите для загрузки
-              </p>
-            </div>
-          </Dragger>
-        </Form.Item>
 
         <Form.Item>
           <Flex justify="space-between" align="center">
