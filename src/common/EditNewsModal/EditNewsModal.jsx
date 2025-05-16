@@ -52,17 +52,21 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
     setFile(item?.file);
   }, [open, data, form]);
 
+  console.log(file);
+
   const onFinish = async (values) => {
-    let filePath = data.body[0].file;
+    let filePath = data?.body?.[0]?.file || "";
 
-    const file =
-      foto !== null
-        ? foto.fileList[0]?.originFileObj
-        : values.photo?.fileList[0]?.originFileObj;
+    // Проверяем, есть ли новый файл
+    const newFile =
+      foto?.fileList?.[0]?.originFileObj ??
+      values?.photo?.fileList?.[0]?.originFileObj ??
+      null;
 
-    if (file) {
+    // Если есть новый файл — грузим его
+    if (newFile) {
       try {
-        const fileBuffer = await file.arrayBuffer();
+        const fileBuffer = await newFile.arrayBuffer();
         const response = await upload(fileBuffer);
         if (response?.data?.status === 200) {
           filePath = response.data.body.path;
@@ -76,7 +80,14 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       }
     }
 
-    update_news({
+    // Если вообще нет ни старого, ни нового — ошибка
+    if (!filePath) {
+      console.error("Нет файла для отправки");
+      return;
+    }
+
+    // Обновляем новость
+    await update_news({
       codeid: id,
       nameid: values.title,
       descr: values.description,
@@ -207,9 +218,9 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
                 </div>
               </Dragger>
             </Form.Item>
-            <Button onClick={onEditExisting}>
+            {/* <Button onClick={onEditExisting}>
               Отредактировать существующий
-            </Button>
+            </Button> */}
           </Col>
           {openCropper && (
             <Col span={12}>

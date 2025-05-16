@@ -79,7 +79,7 @@ export const CropperImg = ({ img, isEdit = false }) => {
         <div>
           <Flex justify="space-between" align="center">
             <Typography variant="overline" className={styles.sliderLabel}>
-              Вращение изображения
+              Повернуть изображения
             </Typography>
             <Button
               onClick={showCroppedImage}
