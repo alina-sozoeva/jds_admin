@@ -34,7 +34,7 @@ export const useNewsColums = (removeNews, editNews) => {
       key: "date_publish",
       align: "center",
       width: 100,
-      render: (text) => dayjs(text).format("DD-MM-YYYY"),
+      render: (text) => dayjs(text).format("DD.MM.YYYY"),
     },
     {
       title: "Фото",

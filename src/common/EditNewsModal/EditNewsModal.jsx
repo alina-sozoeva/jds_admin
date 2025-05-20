@@ -7,6 +7,7 @@ import {
   Input,
   Modal,
   Row,
+  Tabs,
   Upload,
 } from "antd";
 import {
@@ -25,16 +26,24 @@ import { CropperImg } from "../CropperImg";
 
 const { Dragger } = Upload;
 
+const items = [
+  { key: "ru", label: "Русский" },
+  { key: "kg", label: "Кыргызсча" },
+];
+
 export const EditNewsModal = ({ open, onCancel, id }) => {
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
   const [update_news] = useUpdateNewsMutation();
   const [upload] = useUploadFileMutation();
-  const { data } = useGetNewsByIdQuery(id ?? skipToken);
+  const { data, isLoading } = useGetNewsByIdQuery(id ? id : skipToken);
   const foto = useSelector((state) => state.newsFoto.foto);
   const [file, setFile] = useState();
   const [openCropper, setOpenCropper] = useState(false);
+  const [lang, setLang] = useState("");
+
+  console.log(lang);
 
   useEffect(() => {
     const item = data?.body[0];
@@ -46,24 +55,22 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         width: item.width,
         height: item.height,
         photo: item.file,
+        lang: item.lang,
       });
     }
 
+    setLang(item?.lang);
     setFile(item?.file);
   }, [open, data, form]);
-
-  console.log(file);
 
   const onFinish = async (values) => {
     let filePath = data?.body?.[0]?.file || "";
 
-    // Проверяем, есть ли новый файл
     const newFile =
       foto?.fileList?.[0]?.originFileObj ??
       values?.photo?.fileList?.[0]?.originFileObj ??
       null;
 
-    // Если есть новый файл — грузим его
     if (newFile) {
       try {
         const fileBuffer = await newFile.arrayBuffer();
@@ -80,13 +87,11 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       }
     }
 
-    // Если вообще нет ни старого, ни нового — ошибка
     if (!filePath) {
       console.error("Нет файла для отправки");
       return;
     }
 
-    // Обновляем новость
     await update_news({
       codeid: id,
       nameid: values.title,
@@ -95,6 +100,7 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
       file: filePath,
       width: 0,
       height: 0,
+      lang: lang,
     });
 
     form.resetFields();
@@ -139,14 +145,19 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
     form.resetFields();
   };
 
+  const onChangeLang = (key) => {
+    setLang(key);
+  };
+
   return (
     <Modal
-      width={openCropper ? 900 : 500}
+      width={openCropper ? 900 : 400}
       centered
       open={open}
       onCancel={onClose}
       title="Редактировать новость"
       footer={false}
+      loading={isLoading}
     >
       <Form
         onFinish={onFinish}
@@ -154,6 +165,8 @@ export const EditNewsModal = ({ open, onCancel, id }) => {
         name="editNewsForm"
         layout="vertical"
       >
+        <Tabs items={items} activeKey={lang} onChange={onChangeLang} />
+
         <Row gutter={24}>
           <Col span={openCropper ? 12 : 24}>
             <Form.Item

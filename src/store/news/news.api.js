@@ -6,9 +6,10 @@ export const newsApi = createApi({
   tagTypes: ["NewsList"],
   endpoints: (builder) => ({
     getNews: builder.query({
-      query: () => ({
-        url: "/get_news",
+      query: (lang) => ({
+        url: `/get_news`,
         method: "GET",
+        params: lang,
       }),
       providesTags: ["NewsList"],
     }),

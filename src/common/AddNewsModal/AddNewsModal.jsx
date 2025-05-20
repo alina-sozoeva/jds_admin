@@ -7,6 +7,7 @@ import {
   Input,
   Modal,
   Row,
+  Tabs,
   Upload,
 } from "antd";
 import {
@@ -22,6 +23,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 const { Dragger } = Upload;
 
+const items = [
+  { key: "ru", label: "Русский" },
+  { key: "kg", label: "Кыргызсча" },
+];
+
 export const AddNewsModal = ({ open, onCancel }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -30,6 +36,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
   const [file, setFile] = useState();
   const [openCropper, setOpenCropper] = useState(false);
   const foto = useSelector((state) => state.newsFoto.foto);
+  const [lang, setLang] = useState("ru");
 
   const onCropper = (file) => {
     const imageUrl = URL.createObjectURL(file.originFileObj);
@@ -37,7 +44,9 @@ export const AddNewsModal = ({ open, onCancel }) => {
     setFile(imageUrl);
   };
 
-  console.log(foto, "foto");
+  const onChangeLang = (key) => {
+    setLang(key);
+  };
 
   const onFinish = async (values) => {
     let filePath = "";
@@ -71,6 +80,7 @@ export const AddNewsModal = ({ open, onCancel }) => {
       file: filePath,
       width: 0,
       height: 0,
+      lang: lang,
     });
 
     form.resetFields();
@@ -102,6 +112,8 @@ export const AddNewsModal = ({ open, onCancel }) => {
         name="newsCreateForm"
         layout="vertical"
       >
+        <Tabs items={items} defaultActiveKey="ru" onChange={onChangeLang} />
+
         <Row gutter={24}>
           <Col span={openCropper ? 12 : 24}>
             <Form.Item

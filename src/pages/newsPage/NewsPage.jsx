@@ -1,4 +1,4 @@
-import { Button, Flex, Table, Typography } from "antd";
+import { Button, Flex, Table, Tabs, Typography } from "antd";
 import {
   AddNewsModal,
   EditNewsModal,
@@ -12,8 +12,11 @@ import { useNewsColums } from "./useNewsColums";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { useGetNewsQuery } from "../../store";
-import Cropper from "react-easy-crop";
-import foto from "../../assets/news.jpg";
+
+const items = [
+  { key: "ru", label: "Русский" },
+  { key: "kg", label: "Кыргызсча" },
+];
 
 export const NewsPage = () => {
   const [searchName, setSearchName] = useState("");
@@ -22,6 +25,7 @@ export const NewsPage = () => {
   const [openWarningModal, setOpenWarningModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [idNews, setIdNews] = useState("");
+  const [lang, setLang] = useState("ru");
 
   const removeNews = (id) => {
     setIdNews(id);
@@ -35,7 +39,7 @@ export const NewsPage = () => {
 
   const { columns } = useNewsColums(removeNews, editNews);
 
-  const { data } = useGetNewsQuery();
+  const { data, isLoading } = useGetNewsQuery({ lang });
 
   const filteredArr = useMemo(() => {
     return data?.body?.filter((item) => {
@@ -52,9 +56,15 @@ export const NewsPage = () => {
     });
   }, [searchName, searchDate, data?.body]);
 
+  const onChangeLang = (key) => {
+    setLang(key);
+  };
+
   return (
     <Flex vertical className={styles.news}>
       <Typography.Title level={3}>Новостная лента</Typography.Title>
+      <Tabs items={items} defaultActiveKey="ru" onChange={onChangeLang} />
+
       <NewsFilter setSearchName={setSearchName} setSearchDate={setSearchDate} />
       <Wrapper
         header={
@@ -71,6 +81,7 @@ export const NewsPage = () => {
         }
       >
         <Table
+          loading={isLoading}
           dataSource={filteredArr}
           columns={columns}
           bordered
