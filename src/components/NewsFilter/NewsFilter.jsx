@@ -13,7 +13,6 @@ export const NewsFilter = ({ setSearchName, setSearchDate }) => {
 
   return (
     <Flex vertical gap={"large"}>
-      <Typography.Text>Фильтрация:</Typography.Text>
       <Flex gap={"large"}>
         <Input
           placeholder="Поиск по названию"

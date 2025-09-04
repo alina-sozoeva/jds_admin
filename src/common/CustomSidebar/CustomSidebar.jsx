@@ -8,13 +8,23 @@ import logo from "../../assets/logo.png";
 const menuKeys = [
   // {
   //   key: "1",
-  //   label: "О Sakbol",
+  //   label: "Пользователи",
   //   path: "/",
   // },
   {
     key: "2",
-    label: "Новостная лента",
-    path: "/news",
+    label: "Отзывы",
+    path: "/reviews",
+  },
+  {
+    key: "3",
+    label: "Обучение",
+    path: "/study",
+  },
+  {
+    key: "4",
+    label: "Баннеры",
+    path: "/study",
   },
 ];
 
