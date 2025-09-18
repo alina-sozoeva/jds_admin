@@ -7,7 +7,7 @@ import { Button, Flex, Tooltip } from "antd";
 import dayjs from "dayjs";
 import styles from "./ReviewsPage.module.scss";
 
-export const useReviewsColumns = (onUpdateReviews) => {
+export const useReviewsColumns = (onUpdateReviews, removeReview) => {
   const columns = [
     {
       title: "№",
@@ -28,7 +28,7 @@ export const useReviewsColumns = (onUpdateReviews) => {
       title: "Оценка",
       dataIndex: "rating",
       key: "rating",
-      width: 100,
+      width: 60,
       ellipsis: true,
     },
     {
@@ -51,7 +51,7 @@ export const useReviewsColumns = (onUpdateReviews) => {
       dataIndex: "date_system",
       key: "date_system",
       align: "center",
-      width: 100,
+      width: 80,
       render: (text) => dayjs(text).format("DD.MM.YYYY"),
     },
     {
@@ -74,7 +74,7 @@ export const useReviewsColumns = (onUpdateReviews) => {
       title: "...",
       key: "guid",
       align: "center",
-      width: 50,
+      width: 60,
       render: (_, record) => (
         <Flex gap={"small"} justify="center">
           <Tooltip title={"Опубликовать"}>
@@ -87,13 +87,15 @@ export const useReviewsColumns = (onUpdateReviews) => {
             </Button>
           </Tooltip>
 
-          <Button
-            danger
-            style={{ width: "30px" }}
-            // onClick={() => removeNews(record.codeid)}
-          >
-            <DeleteOutlined />
-          </Button>
+          <Tooltip title={"Удалить"}>
+            <Button
+              danger
+              style={{ width: "30px" }}
+              onClick={() => removeReview(record.codeid)}
+            >
+              <DeleteOutlined />
+            </Button>
+          </Tooltip>
         </Flex>
       ),
     },

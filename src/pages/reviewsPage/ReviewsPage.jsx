@@ -4,6 +4,7 @@ import { Wrapper } from "../../common";
 import { SearchOutlined } from "@ant-design/icons";
 import {
   useGetReviewsQuery,
+  useRemoveReviewMutation,
   useUpdateReviewsPublishedMutation,
 } from "../../store";
 import { useReviewsColumns } from "./useReviewsColumns";
@@ -16,14 +17,18 @@ export const ReviewsPage = () => {
   const [search, setSearch] = useState();
 
   const { data } = useGetReviewsQuery({ search });
-
   const [updateReviews] = useUpdateReviewsPublishedMutation();
+  const [deleteReview] = useRemoveReviewMutation();
 
   const onUpdateReviews = (codeid) => {
     updateReviews({ codeid });
   };
 
-  const { columns } = useReviewsColumns(onUpdateReviews);
+  const removeReview = (codeid) => {
+    deleteReview({ codeid });
+  };
+
+  const { columns } = useReviewsColumns(onUpdateReviews, removeReview);
 
   return (
     <Flex vertical className={styles.news}>
@@ -44,7 +49,7 @@ export const ReviewsPage = () => {
           columns={columns}
           dataSource={data?.data}
           bordered
-          scroll={{ y: 300 }}
+          scroll={{ x: 1000, y: 800 }}
           pagination={false}
           rowKey="codeid"
         />

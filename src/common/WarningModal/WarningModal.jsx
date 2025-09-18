@@ -1,7 +1,7 @@
 import { Modal } from "antd";
 import { useRemoveNewsMutation } from "../../store";
 
-export const WarningModal = ({ open, onCancel, id }) => {
+export const WarningModal = ({ open, onCancel, id, title }) => {
   const [remove] = useRemoveNewsMutation();
 
   const onConfirm = () => {
@@ -20,7 +20,7 @@ export const WarningModal = ({ open, onCancel, id }) => {
       cancelText="Отмена"
       okButtonProps={{ danger: true }}
     >
-      <p>Вы уверены, что хотите удалить эту новость?</p>
+      <p>Вы действительно хотите {title} эту новость?</p>
     </Modal>
   );
 };

@@ -29,6 +29,14 @@ export const reviewsApi = createApi({
       }),
       invalidatesTags: ["ReviewsList"],
     }),
+    removeReview: builder.mutation({
+      query: (codeid) => ({
+        url: "/reviews/delete",
+        method: "POST",
+        body: codeid,
+      }),
+      invalidatesTags: ["ReviewsList"],
+    }),
   }),
 });
 
@@ -36,4 +44,5 @@ export const {
   useGetReviewsQuery,
   useAddReviewsMutation,
   useUpdateReviewsPublishedMutation,
+  useRemoveReviewMutation,
 } = reviewsApi;
