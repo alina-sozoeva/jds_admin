@@ -3,7 +3,7 @@ import { Button, Menu, Space } from "antd";
 import styles from "./CustomSidebar.module.scss";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo_without_bg_blue.png";
 
 const menuKeys = [
   // {

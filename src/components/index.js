@@ -1,1 +1,2 @@
-export * from './NewsFilter'
+export * from "./NewsFilter";
+export * from "./ReviewsPage";

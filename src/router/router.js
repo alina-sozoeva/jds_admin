@@ -6,7 +6,7 @@ export const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
-      { path: "/", element: <Navigate to="/news" replace /> },
+      { path: "/", element: <Navigate to="/reviews" replace /> },
       { path: "/reviews", element: <Pages.ReviewsPage /> },
       { path: "/study", element: <Pages.StudyPage /> },
     ],

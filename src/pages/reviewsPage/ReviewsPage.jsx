@@ -1,59 +1,29 @@
-import { Button, Flex, Table, Tabs, Typography } from "antd";
+import { Flex, Input, Table, Typography } from "antd";
+import { Wrapper } from "../../common";
+
+import { SearchOutlined } from "@ant-design/icons";
 import {
-  AddNewsModal,
-  EditNewsModal,
-  WarningModal,
-  Wrapper,
-} from "../../common";
-import { NewsFilter } from "../../components";
-import { VerticalAlignBottomOutlined } from "@ant-design/icons";
+  useGetReviewsQuery,
+  useUpdateReviewsPublishedMutation,
+} from "../../store";
+import { useReviewsColumns } from "./useReviewsColumns";
+import { useState } from "react";
+import { skipToken } from "@reduxjs/toolkit/query";
+
 import styles from "./ReviewsPage.module.scss";
-// import { useNewsColums } from "./useNewsColums";
-import dayjs from "dayjs";
-import { useMemo, useState } from "react";
-import { useGetNewsQuery } from "../../store";
 
 export const ReviewsPage = () => {
-  const [searchName, setSearchName] = useState("");
-  const [searchDate, setSearchDate] = useState();
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openWarningModal, setOpenWarningModal] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [idNews, setIdNews] = useState("");
-  const [lang, setLang] = useState("ru");
+  const [search, setSearch] = useState();
 
-  const removeNews = (id) => {
-    setIdNews(id);
-    setOpenWarningModal(true);
+  const { data } = useGetReviewsQuery({ search });
+
+  const [updateReviews] = useUpdateReviewsPublishedMutation();
+
+  const onUpdateReviews = (codeid) => {
+    updateReviews({ codeid });
   };
 
-  const editNews = (id) => {
-    setIdNews(id);
-    setOpenEditModal(true);
-  };
-
-  // const { columns } = useNewsColums(removeNews, editNews);
-
-  const { data, isLoading } = useGetNewsQuery({ lang });
-
-  const filteredArr = useMemo(() => {
-    return data?.body?.filter((item) => {
-      const matchesName = searchName
-        ? item?.nameid?.toLowerCase().includes(searchName?.toLowerCase())
-        : true;
-
-      const matchesDate = searchDate
-        ? dayjs(item?.date_publish).format("YYYY-MM-DD") ===
-          dayjs(searchDate, "MM-DD-YYYY").format("YYYY-MM-DD")
-        : true;
-
-      return matchesName && matchesDate;
-    });
-  }, [searchName, searchDate, data?.body]);
-
-  const onChangeLang = (key) => {
-    setLang(key);
-  };
+  const { columns } = useReviewsColumns(onUpdateReviews);
 
   return (
     <Flex vertical className={styles.news}>
@@ -62,46 +32,23 @@ export const ReviewsPage = () => {
       <Wrapper
         header={
           <Flex justify="space-between" style={{ flexWrap: "wrap" }}>
-            <NewsFilter
-              setSearchName={setSearchName}
-              setSearchDate={setSearchDate}
+            <Input
+              placeholder="Поиск"
+              prefix={<SearchOutlined />}
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            <Button
-              type="primary"
-              icon={<VerticalAlignBottomOutlined />}
-              onClick={() => setOpenAddModal(true)}
-            >
-              Добавить
-            </Button>
           </Flex>
         }
       >
         <Table
-          loading={isLoading}
-          dataSource={filteredArr}
-          columns={[]}
+          columns={columns}
+          dataSource={data?.data}
           bordered
           scroll={{ y: 300 }}
           pagination={false}
           rowKey="codeid"
         />
       </Wrapper>
-      <AddNewsModal
-        open={openAddModal}
-        onCancel={() => setOpenAddModal(false)}
-      />
-      <WarningModal
-        open={openWarningModal}
-        onCancel={() => setOpenWarningModal(false)}
-        id={idNews}
-      />
-
-      <EditNewsModal
-        open={openEditModal}
-        onCancel={() => setOpenEditModal(false)}
-        id={idNews}
-      />
     </Flex>
   );
 };
