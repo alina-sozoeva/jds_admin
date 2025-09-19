@@ -9,14 +9,13 @@ import {
 } from "../../store";
 import { useReviewsColumns } from "./useReviewsColumns";
 import { useState } from "react";
-import { skipToken } from "@reduxjs/toolkit/query";
 
 import styles from "./ReviewsPage.module.scss";
 
 export const ReviewsPage = () => {
   const [search, setSearch] = useState();
 
-  const { data } = useGetReviewsQuery({ search });
+  const { data } = useGetReviewsQuery(search ? { search } : undefined);
   const [updateReviews] = useUpdateReviewsPublishedMutation();
   const [deleteReview] = useRemoveReviewMutation();
 
@@ -41,6 +40,9 @@ export const ReviewsPage = () => {
               placeholder="Поиск"
               prefix={<SearchOutlined />}
               onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: "400px",
+              }}
             />
           </Flex>
         }

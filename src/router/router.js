@@ -8,7 +8,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Navigate to="/reviews" replace /> },
       { path: "/reviews", element: <Pages.ReviewsPage /> },
-      { path: "/study", element: <Pages.StudyPage /> },
+      { path: "/edu", element: <Pages.EducationPage /> },
     ],
   },
 ]);

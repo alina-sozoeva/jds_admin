@@ -36,7 +36,7 @@ export const useReviewsColumns = (onUpdateReviews, removeReview) => {
       dataIndex: "email",
       key: "email",
       align: "center",
-      width: 150,
+      width: 100,
       ellipsis: true,
     },
     {
@@ -44,7 +44,8 @@ export const useReviewsColumns = (onUpdateReviews, removeReview) => {
       dataIndex: "comment",
       key: "comment",
       align: "center",
-      width: 100,
+      width: 200,
+      ellipsis: true,
     },
     {
       title: "Дата",

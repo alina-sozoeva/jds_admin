@@ -6,11 +6,6 @@ import { useMemo } from "react";
 import logo from "../../assets/logo_without_bg_blue.png";
 
 const menuKeys = [
-  // {
-  //   key: "1",
-  //   label: "Пользователи",
-  //   path: "/",
-  // },
   {
     key: "2",
     label: "Отзывы",
@@ -19,12 +14,12 @@ const menuKeys = [
   {
     key: "3",
     label: "Обучение",
-    path: "/study",
+    path: "/edu",
   },
   {
     key: "4",
     label: "Баннеры",
-    path: "/study",
+    path: "/edu",
   },
 ];
 

@@ -1,0 +1,271 @@
+import {
+  Button,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Upload,
+} from "antd";
+
+import { useState } from "react";
+import { DeleteOutlined } from "@ant-design/icons";
+import { useAddEduMutation } from "../../../store";
+
+import styles from "./AddEduModal.module.scss";
+import clsx from "clsx";
+
+const { Dragger } = Upload;
+
+export const AddEduModal = ({ open, onCancel }) => {
+  const [form] = Form.useForm();
+
+  const [fileList, setFileList] = useState([]);
+
+  const [checkPeriod, setCheckPeriod] = useState(true);
+  const [checkDate, setCheckDate] = useState(false);
+  const [addEdu] = useAddEduMutation();
+
+  const onFinish = async (values) => {
+    const formData = new FormData();
+
+    formData.append("codeid", 0);
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("price", values.price || "");
+    formData.append("location", values.location);
+    if (values.start_date)
+      formData.append("start_date", values.start_date.format("YYYY-MM-DD"));
+    if (values.end_date)
+      formData.append("end_date", values.end_date.format("YYYY-MM-DD"));
+    if (values.event_date)
+      formData.append("event_date", values.event_date.format("YYYY-MM-DD"));
+
+    fileList.forEach((f) => {
+      formData.append("files", f.originFileObj, f.name);
+    });
+
+    await addEdu(formData).unwrap();
+
+    form.resetFields();
+    setFileList();
+    onCancel();
+  };
+
+  const onCheckPeriod = () => {
+    setCheckPeriod(true);
+    setCheckDate(false);
+  };
+
+  const onCheckDate = () => {
+    setCheckDate(true);
+    setCheckPeriod(false);
+  };
+
+  const onClose = () => {
+    onCancel();
+    setFileList();
+    form.resetFields();
+  };
+
+  return (
+    <Modal
+      width={700}
+      centered
+      open={open}
+      onCancel={onClose}
+      title="Добавить"
+      footer={false}
+    >
+      <Form
+        onFinish={onFinish}
+        form={form}
+        name="newsCreateForm"
+        layout="vertical"
+        className={clsx(styles.form)}
+      >
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item
+              name="title"
+              label="Название"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите название" />
+            </Form.Item>
+
+            <Form.Item
+              name="description"
+              label="Описание"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input.TextArea placeholder="Введите описание" />
+            </Form.Item>
+
+            <Form.Item name="price" label="Стоимость">
+              <Input placeholder="Введите стоимость" />
+            </Form.Item>
+
+            <Form.Item
+              name="location"
+              label="Место проведения"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Input placeholder="Введите место проведения" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Flex
+              align="center"
+              justify="space-between"
+              className={clsx("mb-4")}
+            >
+              <Checkbox checked={checkPeriod} onChange={onCheckPeriod}>
+                Период проведения
+              </Checkbox>
+              <Checkbox checked={checkDate} onChange={onCheckDate}>
+                Дата проведения
+              </Checkbox>
+            </Flex>
+
+            <Divider className={clsx("my-2")} />
+
+            {checkPeriod && (
+              <Flex justify="space-between">
+                <Form.Item
+                  name="start_date"
+                  label="Начало периода"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Это обязательное поле для заполнения",
+                    },
+                  ]}
+                >
+                  <DatePicker
+                    placeholder="Выберите дату"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="end_date"
+                  label="Конец периода"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Это обязательное поле для заполнения",
+                    },
+                  ]}
+                >
+                  <DatePicker
+                    placeholder="Выберите дату"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </Flex>
+            )}
+
+            {checkDate && (
+              <Form.Item
+                name="event_date"
+                label="Дата мероприятия"
+                rules={[
+                  {
+                    required: true,
+                    message: "Это обязательное поле для заполнения",
+                  },
+                ]}
+              >
+                <DatePicker
+                  placeholder="Выберите дату"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item
+              name="photo"
+              valuePropName="photos"
+              rules={[
+                {
+                  required: true,
+                  message: "Это обязательное поле для заполнения",
+                },
+              ]}
+            >
+              <Dragger
+                name="file"
+                multiple={true}
+                accept="image/*"
+                beforeUpload={() => false}
+                fileList={fileList}
+                onChange={(info) => setFileList(info.fileList)}
+                itemRender={(originNode, file) => {
+                  //   console.log(originNode, "originNode!!!");
+
+                  const handleDelete = () => {
+                    setFileList((prev) =>
+                      prev.filter((f) => f.uid !== file.uid)
+                    );
+                  };
+
+                  return (
+                    <Flex
+                      justify="space-between"
+                      align="center"
+                      className={styles.wrap}
+                    >
+                      <span>{file?.name}</span>
+                      <Flex gap={"small"}>
+                        <Button
+                          danger
+                          className={styles.btn}
+                          onClick={handleDelete}
+                        >
+                          <DeleteOutlined />
+                        </Button>
+                      </Flex>
+                    </Flex>
+                  );
+                }}
+              >
+                <div className="flex justify-center items-center gap-[11px] h-[30px]">
+                  <p className="ant-upload-hint">
+                    Перетащите файл или нажмите для выбора
+                  </p>
+                </div>
+              </Dragger>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item>
+          <Flex align="center" gap={"small"} justify="center">
+            <Button type="primary" htmlType="submit">
+              Добавить
+            </Button>
+          </Flex>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
