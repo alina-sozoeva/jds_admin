@@ -1,13 +1,9 @@
-import {
-  DeleteOutlined,
-  EditOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Flex, Tooltip } from "antd";
 import dayjs from "dayjs";
 import styles from "./ReviewsPage.module.scss";
 
-export const useReviewsColumns = (onUpdateReviews, removeReview) => {
+export const useReviewsColumns = (onOpenPub, onOpenWar) => {
   const columns = [
     {
       title: "№",
@@ -80,8 +76,9 @@ export const useReviewsColumns = (onUpdateReviews, removeReview) => {
         <Flex gap={"small"} justify="center">
           <Tooltip title={"Опубликовать"}>
             <Button
+              disabled={record?.is_published === 1}
               type="primary"
-              onClick={() => onUpdateReviews(record.codeid)}
+              onClick={() => onOpenPub(record)}
               style={{ width: "30px" }}
             >
               <UploadOutlined />
@@ -92,7 +89,7 @@ export const useReviewsColumns = (onUpdateReviews, removeReview) => {
             <Button
               danger
               style={{ width: "30px" }}
-              onClick={() => removeReview(record.codeid)}
+              onClick={() => onOpenWar(record.codeid)}
             >
               <DeleteOutlined />
             </Button>

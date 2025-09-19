@@ -1,0 +1,11 @@
+.form {
+  :global {
+    .ant-form-item {
+      margin-bottom: 12px !important;
+    }
+    // .ant-upload-list {
+    //   max-height: 150px !important;
+    //   overflow-y: auto;
+    // }
+  }
+}

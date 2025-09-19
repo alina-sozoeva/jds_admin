@@ -5,7 +5,7 @@ import {
   WarningModal,
   Wrapper,
 } from "../../common";
-import { NewsFilter } from "../../components";
+
 import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 import styles from "./NewsPage.module.scss";
 import { useNewsColums } from "./useNewsColums";
@@ -65,7 +65,6 @@ export const NewsPage = () => {
       <Typography.Title level={3}>Новостная лента</Typography.Title>
       <Tabs items={items} defaultActiveKey="ru" onChange={onChangeLang} />
 
-      <NewsFilter setSearchName={setSearchName} setSearchDate={setSearchDate} />
       <Wrapper
         header={
           <Flex justify="space-between" style={{ flexWrap: "wrap" }}>
@@ -99,7 +98,6 @@ export const NewsPage = () => {
         onCancel={() => setOpenWarningModal(false)}
         id={idNews}
       />
-
       <EditNewsModal
         open={openEditModal}
         onCancel={() => setOpenEditModal(false)}

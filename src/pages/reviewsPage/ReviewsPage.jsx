@@ -1,5 +1,5 @@
 import { Flex, Input, Table, Typography } from "antd";
-import { Wrapper } from "../../common";
+import { WarningModal, Wrapper } from "../../common";
 
 import { SearchOutlined } from "@ant-design/icons";
 import {
@@ -11,23 +11,32 @@ import { useReviewsColumns } from "./useReviewsColumns";
 import { useState } from "react";
 
 import styles from "./ReviewsPage.module.scss";
+import { AddPublishModal } from "../../components";
 
 export const ReviewsPage = () => {
   const [search, setSearch] = useState();
+  const [openPub, setOpenPub] = useState(false);
+  const [openWar, setOpenWar] = useState(false);
+  const [item, setItem] = useState();
 
   const { data } = useGetReviewsQuery(search ? { search } : undefined);
-  const [updateReviews] = useUpdateReviewsPublishedMutation();
   const [deleteReview] = useRemoveReviewMutation();
 
-  const onUpdateReviews = (codeid) => {
-    updateReviews({ codeid });
+  const onOpenPub = (item) => {
+    setItem(item);
+    setOpenPub(true);
   };
 
-  const removeReview = (codeid) => {
-    deleteReview({ codeid });
+  const onOpenWar = (item) => {
+    setOpenWar(true);
+    setItem(item);
   };
 
-  const { columns } = useReviewsColumns(onUpdateReviews, removeReview);
+  const removeReview = () => {
+    deleteReview({ codeid: item?.codeid });
+  };
+
+  const { columns } = useReviewsColumns(onOpenPub, onOpenWar);
 
   return (
     <Flex vertical className={styles.news}>
@@ -56,6 +65,17 @@ export const ReviewsPage = () => {
           rowKey="codeid"
         />
       </Wrapper>
+      <WarningModal
+        open={openWar}
+        onCancel={() => setOpenWar(false)}
+        onConfirm={removeReview}
+        title={"отзыв"}
+      />
+      <AddPublishModal
+        open={openPub}
+        onCancel={() => setOpenPub(false)}
+        item={item}
+      />
     </Flex>
   );
 };

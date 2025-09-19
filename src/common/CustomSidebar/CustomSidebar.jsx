@@ -16,11 +16,11 @@ const menuKeys = [
     label: "Обучение",
     path: "/edu",
   },
-  {
-    key: "4",
-    label: "Баннеры",
-    path: "/edu",
-  },
+  // {
+  //   key: "4",
+  //   label: "Баннеры",
+  //   path: "/edu",
+  // },
 ];
 
 export const CustomSidebar = () => {
