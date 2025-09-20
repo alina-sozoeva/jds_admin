@@ -36,3 +36,12 @@
     background-color: rgba(0, 0, 0, 0.05);
   }
 }
+
+.hidden_name {
+  max-width: 250px;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}

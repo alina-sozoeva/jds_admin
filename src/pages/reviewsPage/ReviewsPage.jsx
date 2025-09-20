@@ -12,6 +12,7 @@ import { useState } from "react";
 
 import styles from "./ReviewsPage.module.scss";
 import { AddPublishModal } from "../../components";
+import clsx from "clsx";
 
 export const ReviewsPage = () => {
   const [search, setSearch] = useState();
@@ -19,7 +20,9 @@ export const ReviewsPage = () => {
   const [openWar, setOpenWar] = useState(false);
   const [item, setItem] = useState();
 
-  const { data } = useGetReviewsQuery(search ? { search } : undefined);
+  const { data, isLoading } = useGetReviewsQuery(
+    search ? { search } : undefined
+  );
   const [deleteReview] = useRemoveReviewMutation();
 
   const onOpenPub = (item) => {
@@ -39,7 +42,7 @@ export const ReviewsPage = () => {
   const { columns } = useReviewsColumns(onOpenPub, onOpenWar);
 
   return (
-    <Flex vertical className={styles.news}>
+    <Flex vertical className={clsx("page_wrap")}>
       <Typography.Title level={3}>Отзывы</Typography.Title>
 
       <Wrapper
@@ -57,6 +60,7 @@ export const ReviewsPage = () => {
         }
       >
         <Table
+          loading={isLoading}
           columns={columns}
           dataSource={data?.data}
           bordered

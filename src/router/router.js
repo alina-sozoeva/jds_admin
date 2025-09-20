@@ -9,6 +9,8 @@ export const router = createBrowserRouter([
       { path: "/", element: <Navigate to="/reviews" replace /> },
       { path: "/reviews", element: <Pages.ReviewsPage /> },
       { path: "/edu", element: <Pages.EducationPage /> },
+      { path: "/edu/add", element: <Pages.EditEduPage /> },
+      { path: "/edu/edit/:codeid", element: <Pages.EditEduPage /> },
     ],
   },
 ]);

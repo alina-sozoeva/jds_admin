@@ -5,3 +5,4 @@ export * from "./AddNewsModal";
 export * from "./EditNewsModal";
 export * from "./WarningModal";
 export * from "./CropperImg";
+export * from "./CustomEditor";

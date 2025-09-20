@@ -18,6 +18,8 @@ import { useAddEduMutation } from "../../../store";
 
 import styles from "./AddEduModal.module.scss";
 import clsx from "clsx";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const { Dragger } = Upload;
 
@@ -25,10 +27,20 @@ export const AddEduModal = ({ open, onCancel }) => {
   const [form] = Form.useForm();
 
   const [fileList, setFileList] = useState([]);
-
   const [checkPeriod, setCheckPeriod] = useState(true);
   const [checkDate, setCheckDate] = useState(false);
+
   const [addEdu] = useAddEduMutation();
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+    ],
+  };
 
   const onFinish = async (values) => {
     const formData = new FormData();
@@ -45,8 +57,9 @@ export const AddEduModal = ({ open, onCancel }) => {
     if (values.event_date)
       formData.append("event_date", values.event_date.format("YYYY-MM-DD"));
 
-    fileList.forEach((f) => {
+    fileList.forEach((f, index) => {
       formData.append("files", f.originFileObj, f.name);
+      formData.append("sort_orders", f.sort_order || index);
     });
 
     await addEdu(formData).unwrap();
@@ -74,7 +87,7 @@ export const AddEduModal = ({ open, onCancel }) => {
 
   return (
     <Modal
-      width={700}
+      width={1000}
       centered
       open={open}
       onCancel={onClose}
@@ -89,7 +102,7 @@ export const AddEduModal = ({ open, onCancel }) => {
         className={clsx(styles.form)}
       >
         <Row gutter={24}>
-          <Col span={12}>
+          <Col span={15}>
             <Form.Item
               name="title"
               label="Название"
@@ -113,7 +126,7 @@ export const AddEduModal = ({ open, onCancel }) => {
                 },
               ]}
             >
-              <Input.TextArea rows={7} placeholder="Введите описание" />
+              <ReactQuill theme="snow" modules={modules} />
             </Form.Item>
 
             <Form.Item name="price" label="Стоимость">
@@ -133,7 +146,7 @@ export const AddEduModal = ({ open, onCancel }) => {
               <Input.TextArea rows={2} placeholder="Введите место проведения" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={9}>
             <Flex
               align="center"
               justify="space-between"
@@ -163,7 +176,7 @@ export const AddEduModal = ({ open, onCancel }) => {
                 >
                   <DatePicker
                     placeholder="Выберите дату"
-                    style={{ width: "100%" }}
+                    style={{ width: "160px" }}
                   />
                 </Form.Item>
                 <Form.Item
@@ -178,7 +191,7 @@ export const AddEduModal = ({ open, onCancel }) => {
                 >
                   <DatePicker
                     placeholder="Выберите дату"
-                    style={{ width: "100%" }}
+                    style={{ width: "160px" }}
                   />
                 </Form.Item>
               </Flex>
@@ -234,8 +247,25 @@ export const AddEduModal = ({ open, onCancel }) => {
                       align="center"
                       className={styles.wrap}
                     >
-                      <span>{file?.name}</span>
-                      <Flex gap={"small"}>
+                      <span className={clsx(styles.hidden_name)}>
+                        {file?.name}
+                      </span>
+                      <Flex gap={"small"} align="center">
+                        <Input
+                          style={{ width: "40px", height: "26px" }}
+                          value={file.sort_order || ""}
+                          onChange={(e) => {
+                            const newOrder = e.target.value;
+                            setFileList((prev) =>
+                              prev.map((f) =>
+                                f.uid === file.uid
+                                  ? { ...f, sort_order: newOrder }
+                                  : f
+                              )
+                            );
+                          }}
+                        />
+
                         <Button
                           danger
                           className={styles.btn}

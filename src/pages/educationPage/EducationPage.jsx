@@ -7,16 +7,21 @@ import { useGetEduQuery, useRemoveEduMutation } from "../../store";
 import { useEduColumns } from "./useEduColumns";
 
 import styles from "./EducationPage.module.scss";
+import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 
 export const EducationPage = () => {
+  const navigate = useNavigate();
+
   const [searchName, setSearchName] = useState("");
 
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openWarModal, setOpenWarModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+
   const [item, setItem] = useState();
 
-  const { data: edus } = useGetEduQuery(
+  const { data: edus, isLoading } = useGetEduQuery(
     searchName ? { search: searchName } : undefined
   );
 
@@ -39,7 +44,7 @@ export const EducationPage = () => {
   const { columns } = useEduColumns(onOpenWar, onEditWar);
 
   return (
-    <Flex vertical className={styles.edu}>
+    <Flex vertical className={clsx("page_wrap")}>
       <Typography.Title level={3}>Обучение</Typography.Title>
 
       <Wrapper
@@ -65,6 +70,7 @@ export const EducationPage = () => {
         }
       >
         <Table
+          loading={isLoading}
           dataSource={edus?.data}
           columns={columns}
           bordered
@@ -73,6 +79,7 @@ export const EducationPage = () => {
           rowKey="codeid"
         />
       </Wrapper>
+
       <AddEduModal
         open={openAddModal}
         onCancel={() => setOpenAddModal(false)}

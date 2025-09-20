@@ -23,6 +23,7 @@ import {
 import styles from "./EditEduModal.module.scss";
 import clsx from "clsx";
 import dayjs from "dayjs";
+import ReactQuill from "react-quill";
 
 const { Dragger } = Upload;
 
@@ -37,6 +38,16 @@ export const EditEduModal = ({ open, onCancel, item }) => {
 
   const [addEdu] = useAddEduMutation();
   const [removeEduImg] = useRemoveEduImgMutation();
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+    ],
+  };
 
   const onFinish = async (values) => {
     const formData = new FormData();
@@ -127,7 +138,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
 
   return (
     <Modal
-      width={800}
+      width={1000}
       centered
       open={open}
       onCancel={onClose}
@@ -142,7 +153,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
         className={clsx(styles.form)}
       >
         <Row gutter={24}>
-          <Col span={12}>
+          <Col span={15}>
             <Form.Item
               name="title"
               label="Название"
@@ -166,7 +177,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
                 },
               ]}
             >
-              <Input.TextArea rows={7} placeholder="Введите описание" />
+              <ReactQuill theme="snow" modules={modules} />
             </Form.Item>
 
             <Form.Item name="price" label="Стоимость">
@@ -186,7 +197,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
               <Input.TextArea rows={2} placeholder="Введите место проведения" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={9}>
             <Flex
               align="center"
               justify="space-between"
@@ -216,7 +227,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
                 >
                   <DatePicker
                     placeholder="Выберите дату"
-                    style={{ width: "100%" }}
+                    style={{ width: "160px" }}
                   />
                 </Form.Item>
                 <Form.Item
@@ -231,7 +242,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
                 >
                   <DatePicker
                     placeholder="Выберите дату"
-                    style={{ width: "100%" }}
+                    style={{ width: "160px" }}
                   />
                 </Form.Item>
               </Flex>

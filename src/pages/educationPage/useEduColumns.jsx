@@ -1,6 +1,8 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Flex, Tooltip } from "antd";
 import dayjs from "dayjs";
+import DOMPurify from "dompurify";
+
 import styles from "./EducationPage.module.scss";
 
 export const useEduColumns = (removeEdu, onEditWar) => {
@@ -28,13 +30,12 @@ export const useEduColumns = (removeEdu, onEditWar) => {
         <div
           style={{
             display: "-webkit-box",
-            WebkitLineClamp: 4, // показываем 4 строки
+            WebkitLineClamp: 4,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
           }}
-        >
-          {text}
-        </div>
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
+        />
       ),
     },
 
