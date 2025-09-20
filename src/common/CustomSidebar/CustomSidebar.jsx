@@ -55,6 +55,7 @@ export const CustomSidebar = () => {
         <Menu
           theme="light"
           mode="inline"
+          selectedKeys={[selectedKey]}
           defaultSelectedKeys={[selectedKey]}
           items={menuKeys.map(({ key, label, path }) => ({
             key,

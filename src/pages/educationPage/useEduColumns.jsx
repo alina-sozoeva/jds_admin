@@ -3,7 +3,7 @@ import { Button, Flex, Tooltip } from "antd";
 import dayjs from "dayjs";
 import styles from "./EducationPage.module.scss";
 
-export const useEduColumns = (removeEdu) => {
+export const useEduColumns = (removeEdu, onEditWar) => {
   const columns = [
     {
       title: "№",
@@ -17,23 +17,33 @@ export const useEduColumns = (removeEdu) => {
       title: "Название",
       dataIndex: "title",
       key: "title",
-      width: 100,
-      ellipsis: true,
+      width: 150,
     },
     {
       title: "Описание",
       dataIndex: "description",
       key: "description",
-      align: "center",
       width: 200,
-      ellipsis: true,
+      render: (text) => (
+        <div
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 4, // показываем 4 строки
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {text}
+        </div>
+      ),
     },
+
     {
       title: "Цена",
       dataIndex: "price",
       key: "price",
       align: "center",
-      width: 80,
+      width: 50,
       ellipsis: true,
     },
     {
@@ -41,7 +51,7 @@ export const useEduColumns = (removeEdu) => {
       dataIndex: "location",
       key: "location",
       align: "center",
-      width: 100,
+      width: 150,
       ellipsis: true,
     },
     {
@@ -49,7 +59,7 @@ export const useEduColumns = (removeEdu) => {
       dataIndex: "start_date",
       key: "start_date",
       align: "center",
-      width: 120,
+      width: 100,
       ellipsis: true,
       render: (_, record) => (
         <div>
@@ -76,42 +86,25 @@ export const useEduColumns = (removeEdu) => {
       ellipsis: true,
       render: (text) => (text ? dayjs(text).format("DD.MM.YYYY") : "-"),
     },
-    // {
-    //   title: "Фото",
-    //   dataIndex: "photo",
-    //   key: "photo",
-    //   align: "center",
-    //   width: 100,
-    //   render: (_, record) =>
-    //     record?.file ? (
-    //       <img
-    //         src={`https://sakbol.com/${record?.file}`}
-    //         alt="Фото"
-    //         style={{ width: 50, height: 50, objectFit: "cover" }}
-    //       />
-    //     ) : (
-    //       "Нет фото"
-    //     ),
-    // },
     {
       title: "...",
       key: "guid",
       align: "center",
-      width: 50,
+      width: 60,
       render: (_, record) => (
         <Flex gap={"small"} justify="center">
-          {/* <Button
+          <Button
             type="primary"
-            // onClick={() => editNews(record.codeid)}
+            onClick={() => onEditWar(record)}
             style={{ width: "30px" }}
           >
             <EditOutlined />
-          </Button> */}
+          </Button>
           <Tooltip title={"Удалить"}>
             <Button
               danger
               style={{ width: "30px" }}
-              onClick={() => removeEdu(record.codeid)}
+              onClick={() => removeEdu(record)}
             >
               <DeleteOutlined />
             </Button>

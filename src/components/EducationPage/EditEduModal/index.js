@@ -1,2 +1,1 @@
-export * from "./AddEduModal";
 export * from "./EditEduModal";

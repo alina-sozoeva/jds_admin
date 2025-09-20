@@ -89,7 +89,7 @@ export const useReviewsColumns = (onOpenPub, onOpenWar) => {
             <Button
               danger
               style={{ width: "30px" }}
-              onClick={() => onOpenWar(record.codeid)}
+              onClick={() => onOpenWar(record)}
             >
               <DeleteOutlined />
             </Button>

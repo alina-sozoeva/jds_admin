@@ -12,28 +12,36 @@ import {
   Upload,
 } from "antd";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useAddEduMutation } from "../../../store";
+import {
+  useAddEduMutation,
+  useGetEduQuery,
+  useRemoveEduImgMutation,
+} from "../../../store";
 
-import styles from "./AddEduModal.module.scss";
+import styles from "./EditEduModal.module.scss";
 import clsx from "clsx";
+import dayjs from "dayjs";
 
 const { Dragger } = Upload;
 
-export const AddEduModal = ({ open, onCancel }) => {
+export const EditEduModal = ({ open, onCancel, item }) => {
   const [form] = Form.useForm();
 
   const [fileList, setFileList] = useState([]);
 
-  const [checkPeriod, setCheckPeriod] = useState(true);
+  const [checkPeriod, setCheckPeriod] = useState(false);
   const [checkDate, setCheckDate] = useState(false);
+  const [localItem, setLocalItem] = useState(item);
+
   const [addEdu] = useAddEduMutation();
+  const [removeEduImg] = useRemoveEduImgMutation();
 
   const onFinish = async (values) => {
     const formData = new FormData();
 
-    formData.append("codeid", 0);
+    formData.append("codeid", item?.codeid);
     formData.append("title", values.title);
     formData.append("description", values.description);
     formData.append("price", values.price || "");
@@ -45,16 +53,48 @@ export const AddEduModal = ({ open, onCancel }) => {
     if (values.event_date)
       formData.append("event_date", values.event_date.format("YYYY-MM-DD"));
 
-    fileList.forEach((f) => {
-      formData.append("files", f.originFileObj, f.name);
-    });
+    if (fileList && fileList.length > 0) {
+      fileList.forEach((f) => {
+        formData.append("files", f.originFileObj, f.name);
+      });
+    }
 
     await addEdu(formData).unwrap();
 
     form.resetFields();
-    setFileList();
+    setFileList([]);
     onCancel();
   };
+
+  useEffect(() => {
+    if (item) {
+      const startDate = item?.start_date ? dayjs(item.start_date) : null;
+      const endDate = item?.end_date ? dayjs(item.end_date) : null;
+      const eventDate = item?.event_date ? dayjs(item.event_date) : null;
+
+      form.setFieldsValue({
+        codeid: item?.codeid,
+        title: item?.title,
+        description: item?.description,
+        price: item?.price,
+        location: item?.location,
+        start_date: startDate,
+        end_date: endDate,
+        event_date: eventDate,
+      });
+
+      if (startDate && endDate) {
+        setCheckPeriod(true);
+        setCheckDate(false);
+      } else if (eventDate) {
+        setCheckDate(true);
+        setCheckPeriod(false);
+      } else {
+        setCheckDate(false);
+        setCheckPeriod(false);
+      }
+    }
+  }, [item, form, open]);
 
   const onCheckPeriod = () => {
     setCheckPeriod(true);
@@ -72,13 +112,26 @@ export const AddEduModal = ({ open, onCancel }) => {
     form.resetFields();
   };
 
+  useEffect(() => {
+    setLocalItem(item);
+  }, [item]);
+
+  const delEduImg = async (codeid) => {
+    await removeEduImg({ codeid });
+
+    setLocalItem((prev) => ({
+      ...prev,
+      imgs: prev.imgs.filter((img) => img.codeid !== codeid),
+    }));
+  };
+
   return (
     <Modal
-      width={700}
+      width={800}
       centered
       open={open}
       onCancel={onClose}
-      title="Добавить"
+      title="Редактировать"
       footer={false}
     >
       <Form
@@ -202,16 +255,7 @@ export const AddEduModal = ({ open, onCancel }) => {
               </Form.Item>
             )}
 
-            <Form.Item
-              name="photo"
-              valuePropName="photos"
-              rules={[
-                {
-                  required: true,
-                  message: "Это обязательное поле для заполнения",
-                },
-              ]}
-            >
+            <Form.Item name="photo" valuePropName="photos">
               <Dragger
                 name="file"
                 multiple={true}
@@ -232,7 +276,7 @@ export const AddEduModal = ({ open, onCancel }) => {
                     <Flex
                       justify="space-between"
                       align="center"
-                      className={styles.wrap}
+                      className={clsx(styles.wrap, "mt-2")}
                     >
                       <span>{file?.name}</span>
                       <Flex gap={"small"}>
@@ -255,13 +299,36 @@ export const AddEduModal = ({ open, onCancel }) => {
                 </div>
               </Dragger>
             </Form.Item>
+            <Flex
+              justify="space-between"
+              gap="small"
+              className={clsx(styles.wrap)}
+              vertical
+            >
+              {localItem?.imgs?.map((img) => {
+                return (
+                  <Flex justify="space-between" key={img.img_url}>
+                    <span>{img.original_name}</span>
+                    <Flex gap={"small"}>
+                      <Button
+                        danger
+                        className={styles.btn}
+                        onClick={() => delEduImg(img?.codeid)}
+                      >
+                        <DeleteOutlined />
+                      </Button>
+                    </Flex>
+                  </Flex>
+                );
+              })}
+            </Flex>
           </Col>
         </Row>
 
         <Form.Item>
           <Flex align="center" gap={"small"} justify="center">
             <Button type="primary" htmlType="submit">
-              Добавить
+              Обновить
             </Button>
           </Flex>
         </Form.Item>

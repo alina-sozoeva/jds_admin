@@ -1,6 +1,6 @@
 import { Button, Flex, Input, Table, Typography } from "antd";
 import { WarningModal, Wrapper } from "../../common";
-import { AddEduModal } from "../../components";
+import { AddEduModal, EditEduModal } from "../../components";
 import { SearchOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useGetEduQuery, useRemoveEduMutation } from "../../store";
@@ -13,7 +13,8 @@ export const EducationPage = () => {
 
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openWarModal, setOpenWarModal] = useState(false);
-  const [codeid, setCodeid] = useState();
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [item, setItem] = useState();
 
   const { data: edus } = useGetEduQuery(
     searchName ? { search: searchName } : undefined
@@ -22,15 +23,20 @@ export const EducationPage = () => {
   const [deleteEdu] = useRemoveEduMutation();
 
   const removeEdu = () => {
-    deleteEdu({ codeid });
+    deleteEdu({ codeid: item?.codeid });
   };
 
-  const onOpenWar = (codeid) => {
-    setCodeid(codeid);
+  const onOpenWar = (item) => {
+    setItem(item);
     setOpenWarModal(true);
   };
 
-  const { columns } = useEduColumns(onOpenWar);
+  const onEditWar = (item) => {
+    setItem(item);
+    setOpenEditModal(true);
+  };
+
+  const { columns } = useEduColumns(onOpenWar, onEditWar);
 
   return (
     <Flex vertical className={styles.edu}>
@@ -62,7 +68,7 @@ export const EducationPage = () => {
           dataSource={edus?.data}
           columns={columns}
           bordered
-          scroll={{ x: 1000, y: 800 }}
+          scroll={{ x: 1200, y: 800 }}
           pagination={false}
           rowKey="codeid"
         />
@@ -76,6 +82,11 @@ export const EducationPage = () => {
         onCancel={() => setOpenWarModal(false)}
         onConfirm={removeEdu}
         title={"мероприятие"}
+      />
+      <EditEduModal
+        open={openEditModal}
+        onCancel={() => setOpenEditModal(false)}
+        item={item}
       />
     </Flex>
   );
