@@ -252,7 +252,11 @@ export const AddEduModal = ({ open, onCancel }) => {
                       </span>
                       <Flex gap={"small"} align="center">
                         <Input
-                          style={{ width: "40px", height: "26px" }}
+                          style={{
+                            width: "50px",
+                            height: "26px",
+                            textAlign: "center",
+                          }}
                           value={file.sort_order || ""}
                           onChange={(e) => {
                             const newOrder = e.target.value;

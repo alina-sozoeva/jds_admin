@@ -35,6 +35,7 @@ export const EditEduModal = ({ open, onCancel, item }) => {
   const [checkPeriod, setCheckPeriod] = useState(false);
   const [checkDate, setCheckDate] = useState(false);
   const [localItem, setLocalItem] = useState(item);
+  const [existingImgs, setExistingImgs] = useState([]);
 
   const [addEdu] = useAddEduMutation();
   const [removeEduImg] = useRemoveEduImgMutation();
@@ -65,8 +66,9 @@ export const EditEduModal = ({ open, onCancel, item }) => {
       formData.append("event_date", values.event_date.format("YYYY-MM-DD"));
 
     if (fileList && fileList.length > 0) {
-      fileList.forEach((f) => {
+      fileList.forEach((f, index) => {
         formData.append("files", f.originFileObj, f.name);
+        formData.append("sort_orders", f.sort_order || index);
       });
     }
 
@@ -135,6 +137,12 @@ export const EditEduModal = ({ open, onCancel, item }) => {
       imgs: prev.imgs.filter((img) => img.codeid !== codeid),
     }));
   };
+
+  useEffect(() => {
+    if (item?.imgs) {
+      setExistingImgs(item.imgs);
+    }
+  }, [item]);
 
   return (
     <Modal
@@ -291,6 +299,24 @@ export const EditEduModal = ({ open, onCancel, item }) => {
                     >
                       <span>{file?.name}</span>
                       <Flex gap={"small"}>
+                        <Input
+                          style={{
+                            width: "50px",
+                            height: "26px",
+                            textAlign: "center",
+                          }}
+                          value={file.sort_order || ""}
+                          onChange={(e) => {
+                            const newOrder = e.target.value;
+                            setFileList((prev) =>
+                              prev.map((f) =>
+                                f.uid === file.uid
+                                  ? { ...f, sort_order: newOrder }
+                                  : f
+                              )
+                            );
+                          }}
+                        />
                         <Button
                           danger
                           className={styles.btn}
@@ -316,22 +342,34 @@ export const EditEduModal = ({ open, onCancel, item }) => {
               className={clsx(styles.wrap)}
               vertical
             >
-              {localItem?.imgs?.map((img) => {
-                return (
-                  <Flex justify="space-between" key={img.img_url}>
-                    <span>{img.original_name}</span>
-                    <Flex gap={"small"}>
-                      <Button
-                        danger
-                        className={styles.btn}
-                        onClick={() => delEduImg(img?.codeid)}
-                      >
-                        <DeleteOutlined />
-                      </Button>
-                    </Flex>
+              {existingImgs.map((img) => (
+                <Flex justify="space-between" key={img.codeid}>
+                  <span>{img.original_name}</span>
+                  <Flex gap="small">
+                    {/* <Input
+                      style={{
+                        width: "50px",
+                        height: "26px",
+                        textAlign: "center",
+                      }}
+                      value={img.sort_order || ""}
+                      onChange={(e) => {
+                        const newOrder = e.target.value;
+                        setExistingImgs((prev) =>
+                          prev.map((f) =>
+                            f.codeid === img.codeid
+                              ? { ...f, sort_order: newOrder }
+                              : f
+                          )
+                        );
+                      }}
+                    /> */}
+                    <Button danger onClick={() => delEduImg(img.codeid)}>
+                      <DeleteOutlined />
+                    </Button>
                   </Flex>
-                );
-              })}
+                </Flex>
+              ))}
             </Flex>
           </Col>
         </Row>
