@@ -297,7 +297,9 @@ export const EditEduModal = ({ open, onCancel, item }) => {
                       align="center"
                       className={clsx(styles.wrap, "mt-2")}
                     >
-                      <span>{file?.name}</span>
+                      <span className={clsx(styles.hidden_name)}>
+                        {file?.name}
+                      </span>
                       <Flex gap={"small"}>
                         <Input
                           style={{
@@ -344,7 +346,9 @@ export const EditEduModal = ({ open, onCancel, item }) => {
             >
               {existingImgs.map((img) => (
                 <Flex justify="space-between" key={img.codeid}>
-                  <span>{img.original_name}</span>
+                  <span className={clsx(styles.hidden_name)}>
+                    {img.original_name}
+                  </span>
                   <Flex gap="small">
                     {/* <Input
                       style={{

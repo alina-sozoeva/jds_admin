@@ -1,29 +1,35 @@
-import { Flex, Input, Table, Typography } from "antd";
+import { Button, Flex, Input, Table, Typography } from "antd";
 import { WarningModal, Wrapper } from "../../common";
 
-import { SearchOutlined } from "@ant-design/icons";
-import { useGetReviewsQuery, useRemoveReviewMutation } from "../../store";
-import { useReviewsColumns } from "./useReviewsColumns";
+import { SearchOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import {
+  useGetBannersQuery,
+  useGetReviewsQuery,
+  useRemoveBannerMutation,
+  useRemoveReviewMutation,
+} from "../../store";
+
 import { useState } from "react";
 
-import { AddPublishModal } from "../../components";
-import styles from "./ReviewsPage.module.scss";
+import styles from "./BannersPage.module.scss";
 import clsx from "clsx";
+import { useBannersColumns } from "./useBannersColumns";
+import { AddBannerModal } from "../../components";
 
-export const ReviewsPage = () => {
+export const BannersPage = () => {
   const [search, setSearch] = useState();
-  const [openPub, setOpenPub] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
   const [openWar, setOpenWar] = useState(false);
   const [item, setItem] = useState();
 
-  const { data, isLoading } = useGetReviewsQuery(
-    search ? { search } : undefined
-  );
-  const [deleteReview] = useRemoveReviewMutation();
+  const { data, isLoading } = useGetBannersQuery();
+  const [deleteReview] = useRemoveBannerMutation();
+
+  console.log(data, "data");
 
   const onOpenPub = (item) => {
     setItem(item);
-    setOpenPub(true);
+    // setOpenAdd(true);
   };
 
   const onOpenWar = (item) => {
@@ -35,15 +41,15 @@ export const ReviewsPage = () => {
     deleteReview({ codeid: item?.codeid });
   };
 
-  const { columns } = useReviewsColumns(onOpenPub, onOpenWar);
+  const { columns } = useBannersColumns(onOpenPub, onOpenWar);
 
   return (
     <Flex vertical className={clsx("page_wrap")}>
-      <Typography.Title level={3}>Отзывы</Typography.Title>
+      <Typography.Title level={3}>Банннеры</Typography.Title>
 
       <Wrapper
         header={
-          <Flex justify="space-between" style={{ flexWrap: "wrap" }}>
+          <Flex gap="small" style={{ flexWrap: "wrap" }}>
             <Input
               placeholder="Поиск"
               prefix={<SearchOutlined />}
@@ -52,6 +58,13 @@ export const ReviewsPage = () => {
                 width: "400px",
               }}
             />
+            <Button
+              type="primary"
+              icon={<VerticalAlignBottomOutlined />}
+              onClick={() => setOpenAdd(true)}
+            >
+              Добавить
+            </Button>
           </Flex>
         }
       >
@@ -71,11 +84,7 @@ export const ReviewsPage = () => {
         onConfirm={removeReview}
         title={"отзыв"}
       />
-      <AddPublishModal
-        open={openPub}
-        onCancel={() => setOpenPub(false)}
-        item={item}
-      />
+      <AddBannerModal open={openAdd} onCancel={() => setOpenAdd(false)} />
     </Flex>
   );
 };
